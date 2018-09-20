@@ -16,8 +16,9 @@ mvn archetype:generate -DgroupId=proGroupID -DartifactId=MyProject -DarchetypeAr
 // 构建本项目
 mvn package
     
-// mvn clean
-将target文件夹下编译产生的.class文件删除，作用是清理上一次构建生成的文件。有些类似于Myeclipse中Project — clean菜单。
+// 将target文件夹下编译产生的.class文件删除，作用是清理上一次构建生成的文件。有些类似于
+// Myeclipse中Project — clean菜单。
+mvn clean
 
 // 编译整个工程，生成的.class文件存放到target目录下。
 mvn compile
