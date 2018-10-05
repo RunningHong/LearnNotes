@@ -38,7 +38,7 @@ Throwable类是所有异常类的根。所有的Java异常类都直接或间接�
 
 - ArithmeticException
 - NullPointerException
-- IndexOutOfBoundsException
+- IndexOutOfBoundsException 
 
 ## 3 免检异常和必检异常
 
