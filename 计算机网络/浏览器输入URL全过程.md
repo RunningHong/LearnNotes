@@ -49,7 +49,7 @@
 
 服务器端收到请求后的由web服务器（准确说应该是http服务器）处理请求，诸如Apache、Ngnix、IIS等。web服务器解析用户请求，知道了需要调度哪些资源文件，再通过相应的这些资源文件处理用户请求和参数，并调用数据库信息，最后将结果通过web服务器返回给浏览器客户端。
 
-![å¾çæè¿°](https://segmentfault.com/img/bVYQcl?w=808&h=237)
+![](https://github.com/RunningHong/LearnNotes/blob/master/picture/%E8%AF%B7%E6%B1%82%E8%B5%84%E6%BA%90.png?raw=true)
 
 ## 5 返回响应结果
 
@@ -66,9 +66,9 @@ HTTP响应报文也是由三部分组成: **状态码**, **响应报头**和**�
 
 ## 6 关闭TCP连接
 
-为了避免服务器与客户端双方的资源占用和损耗，当双方没有请求或响应传递时，任意一方都可以发起关闭请求。与创建TCP连接的3次握手类似，关闭TCP连接，需要**4次握手**。
+为了避免服务器与客户端双方的资源占用和损耗，当双方没有请求或响应传递时，任意一方都可以发起关闭请求。与创建TCP连接的3次握手类似，关闭TCP连接，需要**4次挥手**。
 
-![å¾çæè¿°](https://segmentfault.com/img/bVYQci?w=489&h=374)
+![](https://github.com/RunningHong/LearnNotes/blob/master/picture/%E5%9B%9B%E6%AC%A1%E6%8C%A5%E6%89%8B.png?raw=true)
 
 **模拟现实场景**
 

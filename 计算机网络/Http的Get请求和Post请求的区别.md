@@ -21,8 +21,6 @@
 
    对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok（返回数据）。
 
-
-
 <table>
 	<tr>
         <td></td>
