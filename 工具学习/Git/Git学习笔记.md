@@ -55,7 +55,8 @@ stash相关(类似栈结构)
 - `git clone git@server-name:path/repo-name.git` 把仓库文件**clone**到本地。
 - `git remote add origin git@server-name:path/repo-name.git` 添加**远程库**。
 - `git remote -v` 查看**远程地址**。
-- `git remote rm origin` 删除已关联的名为origin的远程库（绑定错地址时使用）
+- `git remote rm origin` 删除已关联的名为origin的远程库（绑定错地址时使用）。
+- `git config --global color.ui auto` 获得彩色输出。
 
 
 
