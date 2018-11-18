@@ -23,9 +23,9 @@ drwxr-xr-x 23 root root 4096 Sep 8 14:21 ..
 -rw-r--r-- 1 root root 191 Jan 6 2007 .bash_profile
 -rw-r--r-- 1 root root 176 Jan 6 2007 .bashrc
 -rw-r--r-- 1 root root 100 Jan 6 2007 .cshrc
-drwx------ 3 root root 4096 Sep 5 10:37 .gconf <=范例说明处
+drwx------ 3 root root 4096 Sep 5 10:37 .gconf <=============范例说明处
 drwx------ 2 root root 4096 Sep 5 14:09 .gconfd
--rw-r--r-- 1 root root 42304 Sep 4 18:26 install.log <=范例说明处
+-rw-r--r-- 1 root root 42304 Sep 4 18:26 install.log <=======范例说明处
 -rw-r--r-- 1 root root 5661 Sep 4 18:25 install.log.syslog
 ```
 

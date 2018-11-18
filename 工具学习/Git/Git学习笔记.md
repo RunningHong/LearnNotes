@@ -4,6 +4,8 @@
 
 ## 1 常用命令
 
+基础
+
 - `git status` 查看状态。
 
 - `git add` 把文件**添加**到仓库。
@@ -22,11 +24,25 @@
 
 
 
+分支相关
+
 - `git branch dev` 创建dev分支。
-
 - `git chechout dev` 切换到dev分支。
-
+- `git checkout -b 分支名`  创建分支并切换到该分支。
 - `git branch` 查看当前分支。
+- `git merge 分支名` 将需要合并的分支和合并到当前分支。
+- `git branch -d 分支名` 删除该分支。
+- `git log --graph` 查看分支合并图。
+
+
+
+stash相关(类似栈结构)
+
+- `git stash` 把当前工作现场“储藏”起来，等以后恢复现场后继续工作
+- `git stash list` 查看已有的工作现场（包括隐藏的现场）
+- `git stash apply` 恢复最近的现场，恢复后stash内容并不删除。
+- `git stash drop` 删除最近的现场。
+- `git stash pop` 恢复现场，并删除备份的现场。
 
 
 
@@ -34,12 +50,70 @@
 ## 2 不常用命令
 
 - `git init`  把当前目录变成Git可以管理的仓库。
-
 - `git config --global user.name "Your Name" ` 给本地的Git取名字。
 - `git config --global user.email "email@example.com"` 给本地Git绑定邮箱。
 - `git clone git@server-name:path/repo-name.git` 把仓库文件**clone**到本地。
 - `git remote add origin git@server-name:path/repo-name.git` 添加**远程库**。
 - `git remote -v` 查看**远程地址**。
+- `git remote rm origin` 删除已关联的名为origin的远程库（绑定错地址时使用）
+
+
+
+## 3 忽略文件的使用（.gitignore）
+
+------
+
+### 3.1 .gitignore文件的使用
+
+有些时候，你必须把某些文件放到Git工作目录中，但又不能提交它们，比如保存了数据库密码的配置文件。
+
+这时我们就只需在Git工作区根目录下创建一个特殊的文件 `.gitignore` 文件，然后把要忽略的文件填进去，Git就会自动忽略这些文件，最后一步就是把 `.gitignore` 文件提交到Git就好了。
+
+有些时候，你想**添加一个被忽略的文件到Git**，会出现该问题：
+
+```
+$ git add App.class
+The following paths are ignored by one of your .gitignore files:
+App.class
+Use -f if you really want to add them.
+```
+
+如果你确实想添加该文件，可以用`-f`强制添加到Git：
+
+```
+$ git add -f App.class
+```
+
+或者你发现，可能是`.gitignore`写得有问题，需要找出来到底哪个规则写错了，可以用`git check-ignore`命令检查：
+
+```
+$ git check-ignore -v App.class
+.gitignore:3:*.class    App.class
+```
+
+Git会告诉我们，`.gitignore`的第3行规则忽略了该文件，于是我们就可以知道应该修订哪个规则。
+
+### 3.2 .gitignore文件无效的解决方法
+
+`.gitignore`只能忽略那些原来没有被 track 的文件，如果某些文件已经被纳入了版本管理中，则修改 `.gitignore` 是无效的。解决方法是**先把本地缓存删除，然后再提交**。
+
+```java
+git rm -r --cached .     // 此处用的是【.】删除的是所有的缓存，如果不想删除所有的见后面的方法
+git add .
+git commit -m '修复追踪一些被忽略的文件的问题'
+```
+
+**如果缓存中有重要的数据更改，那么你只需要单独删除不要的缓存**：
+
+```java
+git rm --cached logs/xx.log // 指定清除某个文件的缓存
+```
+
+
+
+
+
+
 
 
 
