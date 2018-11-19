@@ -16,7 +16,7 @@ version '1.0-SNAPSHOT'
 // 在多项目构建中(在根项目配置)添加所有模块的设置
 // allProjects可以填build.gradle中所有的选项(apply plugin,repositories等等)
 // 这样在setting.gradle中include的子模块中就可以不用写重复的代码了
- allProjects {
+ allprojects {
      apply plugin: 'java'
      sourceCompatibility = 1.8
      ......
@@ -35,13 +35,10 @@ sourceCompatibility = 1.8
 
 // 使用阿里云服务器进行仓库管理
 repositories {
-    // maven库
-    def aliyunUrl = "http://maven.aliyun.com/nexus/content/groups/public/"
-    def artifactUrl = "http://central.maven.org/maven2/"
     // 先从url中下载jar若没有找到，则在artifactUrls中寻找
     maven {
-        url aliyunUrl
-        artifactUrls artifactUrl
+        url "http://maven.aliyun.com/nexus/content/groups/public/"
+        artifactUrls "http://central.maven.org/maven2/"
     }
 }
 
