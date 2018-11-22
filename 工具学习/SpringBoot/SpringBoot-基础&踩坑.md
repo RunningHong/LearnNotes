@@ -22,7 +22,7 @@ SpringBoot是一个约定优于配置的框架，在很多时候大大的减少�
 
 ### 2.1 启动类踩坑
 
-启动类使用`@SpringBootApplication`标识，并且启动类放到**src**下（spring boot默认会扫描启动类同包以及各子包的注解），如果没有放到src下面可能会出现以下问题：
+启动类使用`@SpringBootApplication`标识，并且启动类放到**根目录（src.main.java）**下（spring boot默认会扫描启动类同包以及各子包的注解），如果没有放到根目录下面可能会出现以下问题：
 
 - 使用 `@Autowired ` 注解时则会出现，could not autowired no bean have been found错误。
 

@@ -1,3 +1,5 @@
+[TOC]
+
 # SpringBoot-Gradle整合
 
 ## 1 build.gradle文件
@@ -10,8 +12,6 @@ version '1.0-SNAPSHOT'
 // 可在Gradle-Tasks-build中找到相应的插件启动程序
 apply plugin: 'java'
 apply plugin: 'war'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
 
 //声明java源码的版本
 sourceCompatibility = 1.8
@@ -36,6 +36,7 @@ dependencies {
     // springboot依赖的jar包
     //使用 Controller 的时候需要引入 web 包
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.4.RELEASE'
+    // 热部署需要使用devtools
     compile group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '2.0.4.RELEASE'
 }
 ```
@@ -56,7 +57,7 @@ public class Application {
 }
 ```
 
-启动类使用`@SpringBootApplication`标识，并且启动类放到**src**下（spring boot默认会扫描启动类同包以及各子包的注解）
+启动类使用`@SpringBootApplication`标识，并且启动类放到**根目录（src.main.java）**下（spring boot默认会扫描启动类同包以及各子包的注解）
 
 ## 3 一个Controller类
 
