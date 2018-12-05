@@ -46,11 +46,20 @@ repositories {
 // 依赖管理
 dependencies {
     // 依赖的模块（使用’:‘ + modelName表示依赖的模块）(多项目构建中使用)
-    compile project(":modelName")
+    // compile project(":modelName")
     
     // 依赖的jar包
     compile group: 'junit', name: 'junit', version: '4.12'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    
+    // 依赖jar包简写模式
+    compile 'org.jxls:jxls:2.4.7'
+    
+    // 强制使用指定版本jar（gradle的有些策略会使用最新的jar有时会引发一些问题）
+    compile ('org.apache.poi:poi:3.13') { force = true }
+    
+    // 忽略jar的传递性
+    compile("org.springframework:spring-web:4.3.4.RELEASE") { transitive = false }
 }
 
 
