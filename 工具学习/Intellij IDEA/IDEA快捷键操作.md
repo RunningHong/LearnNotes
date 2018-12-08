@@ -97,7 +97,7 @@ InputStream is = FileUtil.class.getClassLoader().getResourceAsStream("picture/dd
 
 注：**picture** 为**resources** 的第一层目录。
 
-
+![](https://github.com/RunningHong/LearnNotes/blob/master/picture/ideaResource.png?raw=true)
 
 ## 不常用操作
 
