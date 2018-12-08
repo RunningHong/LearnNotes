@@ -87,6 +87,18 @@
 14，把自定义的查看对象的值，分开到另一个tab页。
 15，有时候当我们步入方法体之后，还想回退到方法体外，点这个按钮后，断点重新回到方法体之外。在继续还是可以再次进到方法内（这个很好的，假设你手快，跳过想断点的方法，然后这个drop frame，出去之后，就可以再次debug啦。这个着重介绍一下）
 
+## 8 idea读取resource文件
+
+前提：当前类为FileUtil，读取resources的picture目录下的ddd.txt文件。
+
+```java
+InputStream is = FileUtil.class.getClassLoader().getResourceAsStream("picture/ddd.txt");
+```
+
+注：**picture** 为**resources** 的第一层目录。
+
+
+
 ## 不常用操作
 
 - `Ctrl+Alt+Shift+U` 在新窗口打开UML类图。
