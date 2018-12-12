@@ -1,4 +1,4 @@
-# 1 Http的Get请求和Post请求的区别
+# Http的Get请求和Post请求的区别
 
 1. get是从服务器获取数据，post是发送数据到服务器。
 

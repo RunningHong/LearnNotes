@@ -41,7 +41,7 @@ dependencies {
 }
 ```
 
-## 2  启动类
+## 2 启动类
 
 ```java
 package com.zh.springboot;

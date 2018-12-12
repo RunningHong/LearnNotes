@@ -1,6 +1,6 @@
-# 1 Hibernate & MyBatis & Spring
+# Hibernate & MyBatis & Spring
 
-## 1.1 Hibernate & MyBatis优缺点比较
+## 1 Hibernate & MyBatis优缺点比较
 
 HIbernate：
 
@@ -22,7 +22,7 @@ MyBtis:
 
 - 开发效率相对于Hibernate较低。
 
-## 1.2 Spring与MyBatis的整合
+## 2 Spring与MyBatis的整合
 
 1. 导入相应的jar包（Spring、MyBatis）
 2. 导入Mybatis与Spring个的整合包（mybatis-spring-1.3.1.jar）

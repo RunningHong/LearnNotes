@@ -1,3 +1,5 @@
+[TOC]
+
 # String源码分析
 
 String表示字符串，Java中所有字符串的字面值都是String类的实例，例如“ABC”。**字符串是常量，在定义之后不能被改变，字符串缓冲区支持可变的字符串。因为 String 对象是不可变的，所以可以共享它们。**
@@ -10,7 +12,7 @@ String表示字符串，Java中所有字符串的字面值都是String类的实�
 
 
 
-## 定义
+## 1 定义
 
 ```Java
 public final class String implements java.io.Serializable, Comparable<String>, CharSequence 
@@ -20,7 +22,7 @@ public final class String implements java.io.Serializable, Comparable<String>, C
 
 
 
-## 属性
+## 2 属性
 
 ```java
 private final char value[];
@@ -30,9 +32,9 @@ String的底层存储结构就是char[]，并且被声明为final，所以String
 
 
 
-## 构造方法
+## 3 构造方法
 
-### 使用字符数组构造String
+### 3.1 使用字符数组构造String
 
 ```java
     public String(char value[]) {
@@ -42,13 +44,13 @@ String的底层存储结构就是char[]，并且被声明为final，所以String
 
 在构造方法中，String是把value数组通过Arrays.copyOf方法直接拷贝到了一个新数组，并把值返回给value属性；
 
-### 使用字节数组构造String
+### 3.2 使用字节数组构造String
 
 在Java中，String实例中保存有一个`char[]`字符数组，`char[]`字符数组是以unicode码来存储的，String 和 char 为内存形式，byte是网络传输或存储的序列化形式。所以在很多传输和存储的过程中需要将byte[]数组和String进行相互转化。所以，String提供了一系列重载的构造方法来将一个字符数组转化成String，提到byte[]和String之间的相互转换就不得不关注编码问题。**String(byte[] bytes, Charset charset)是指通过charset来解码指定的byte数组，将其解码成unicode的char[]数组，构造成新的String。**
 
-## 方法
+## 4 方法
 
-### equals方法
+### 4.1 equals方法
 
 ```java
     public boolean equals(Object anObject) {
@@ -76,7 +78,7 @@ String的底层存储结构就是char[]，并且被声明为final，所以String
 
 首先比较this==anObject?，之后判断instanceof String，之后再判断长度是否相等，最后在一个一个比较元素是否相等。
 
-### hashCode方法
+### 4.2 hashCode方法
 
 ```java
     public int hashCode() {
@@ -95,7 +97,7 @@ String的底层存储结构就是char[]，并且被声明为final，所以String
 
 在存储数据计算hash地址的时候，我们希望尽量减少有同样的hash地址，所谓“冲突”。如果使用相同hash地址的数据过多，那么这些数据所组成的hash链就更长，从而降低了查询效率！所以在选择系数的时候要选择尽量长的系数并且让乘法尽量不要溢出的系数，因为如果计算出来的hash地址越大，所谓的“冲突”就越少，查找起来效率也会提高。
 
-### subString方法
+### 4.3 subString方法
 
 ```java
 public String substring(int beginIndex) {
@@ -112,7 +114,7 @@ public String substring(int beginIndex) {
 
 原理其实是根据开始的下标和长度返回了一个新的String。
 
-### intern方法
+### 4.4 intern方法
 
 ```java
     public native String intern();
@@ -125,7 +127,7 @@ public String substring(int beginIndex) {
 
 
 
-## String对‘+’的重载
+## 5 String对‘+’的重载
 
 底层原理：使用StringBuilder以及其append方法和toString方法。
 
@@ -147,22 +149,22 @@ String str = (new StringBuilder("aaa")).append("bbb").toString();
 
 
 
-## String为什么要被设计为不可变
+## 6 String为什么要被设计为不可变
 
-### 字符串池
+### 6.1 字符串池
 
 字符串池是方法区中的一部分特殊存储。当一个字符串被被创建的时候，首先会去这个字符串池中查找，如果找到，直接返回对该字符串的引用。
 如果字符串可变的话，**当两个引用指向指向同一个字符串时，对其中一个做修改就会影响另外一个。**
 
-### 缓存Hashcode
+### 6.2 缓存Hashcode
 
 Java中经常会用到字符串的哈希码（hashcode）。例如，在HashMap中，**字符串的不可变能保证其hashcode永远保持一致**，这样就可以避免一些不必要的麻烦。这也就意味着每次在使用一个字符串的hashcode的时候不用重新计算一次，这样更加高效。
 
-### 安全性
+### 6.3 安全性
 
 String被广泛的使用在其他Java类中充当参数。比如网络连接、打开文件等操作。如果字符串可变，那么类似操作可能导致安全问题。因为某个方法在调用连接操作的时候，他认为会连接到某台机器，但是实际上并没有（其他引用同一String对象的值修改会导致该连接中的字符串内容被修改）。可变的字符串也可能导致反射的安全问题，因为他的参数也是字符串。
 
-### 不可变对象是天生的线程安全对象
+### 6.4 不可变对象是天生的线程安全对象
 
 因为不可变对象不能被改变，所以他们可以自由地在多个线程之间共享。不需要任何同步处理。
 

@@ -1,6 +1,8 @@
+[TOC]
+
 # Integer源码分析
 
-## 类定义
+## 1 类定义
 
 ```java
 public final class Integer extends Number implements Comparable<Integer>
@@ -8,13 +10,13 @@ public final class Integer extends Number implements Comparable<Integer>
 
 从中我们可以看出Integer被final修饰是不能被继承的，Integer实现了Comparable方法但只能和Integer类型对象进行比较。
 
-## 属性
+## 2 属性
 
 ```java
 private final int value;
 ```
 
-## 公共属性
+## 3 公共属性
 
 ```java
 //值为 （－（2的31次方）） 的常量，它表示 int 类型能够表示的最小值。
@@ -29,9 +31,9 @@ public static final int SIZE = 32;
 public static final int BYTES = SIZE / Byte.SIZE;
 ```
 
-## 方法
+## 4 方法
 
-### 构造方法
+### 4.1 构造方法
 
 ```java
 //构造一个新分配的 Integer 对象，它表示指定的 int 值。
@@ -47,7 +49,7 @@ public Integer(String s) throws NumberFormatException {
 
 从构造方法中我们可以知道，初始化一个Integer对象的时候只能创建一个十进制的整数。
 
-### valueOf方法
+### 4.2 valueOf方法
 
 ```java
 public static Integer valueOf(int i) {
@@ -93,7 +95,7 @@ static {
 
 所以，当把一个int变量转成Integer的时候（或者新建一个Integer的时候），建议使用valueOf方法来代替构造函数。或者直接使用`Integer i = 100;`编译器会转成`Integer s = Integer.valueOf(10000);`
 
-### decode方法
+### 4.3 decode方法
 
 ```java
 public static Integer decode(String nm) throws NumberFormatException

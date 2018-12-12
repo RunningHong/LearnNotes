@@ -16,21 +16,49 @@ Web Flux
 
 
 
-## 2 踩坑
+## 2 静态资源访问
+
+spring boot项目只有src目录，没有webapp目录，会将静态访问(html/图片等)映射到其自动配置的静态目录：
+
+```txt
+/static
+
+/public
+
+/resources
+
+/META-INF/resources
+```
+
+比如，在resources建立一个static目录和index.htm静态文件，访问地址 <http://localhost:8080/index.html> 
+
+如果要从后台跳转到静态index.html，代码如下。
+
+```java
+@Controller
+public class HtmlController {
+	@GetMapping("/html")
+	public String html() {
+		return "/index.html";
+}
+```
+
+
+
+## 踩坑
 
 SpringBoot是一个约定优于配置的框架，在很多时候大大的减少我们的工作，但有些东西如果不知道，则会出现一些不可预料的错误。
 
-### 2.1 启动类踩坑
+### 1 启动类踩坑
 
 启动类使用`@SpringBootApplication`标识，并且启动类放到**根目录（src.main.java）**下（spring boot默认会扫描启动类同包以及各子包的注解），如果没有放到根目录下面可能会出现以下问题：
 
 - 使用 `@Autowired ` 注解时则会出现，could not autowired no bean have been found错误。
-
 - 可能出现某些请求路径出现404无法访问的情况。
 
 **解决方法**：把启动类放到src目录下，使之扫描所有的文件。
 
-### 2.2 指定自动扫描包目录路径
+### 2 指定自动扫描包目录路径
 
 在开发中我们知道spring boot默认会扫描启动类同包以及子包下的注解，那么如何改变这种扫描包的方式呢。
 
@@ -40,6 +68,6 @@ SpringBoot是一个约定优于配置的框架，在很多时候大大的减少�
 @ComponentScan(basePackages{"com.zh.controller","com.zh.service","需要扫描的路径..."})
 ```
 
-### 2.3 IDEA出现Could not autowire. No beans of 'xxxx' type found的错误提示
+### 3 IDEA出现Could not autowire. No beans of 'xxxx' type found的错误提示
 
 **解决方法见**：https://blog.csdn.net/viqqw/article/details/79421826

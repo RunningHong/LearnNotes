@@ -1,12 +1,14 @@
+[TOC]
+
 # Enum源码分析
 
-## 定义
+## 1 定义
 
 ```java
 public abstract class Enum<E extends Enum<E>> implements Comparable<E>, Serializable
 ```
 
-### 1.抽象类（但不可被继承）
+### 1.1 抽象类（但不可被继承）
 
 首先，**抽象类不能被实例化**，所以我们**在java程序中不能使用new关键字来声明一个Enum**，如果想要定义可以使用这样的语法：
 
