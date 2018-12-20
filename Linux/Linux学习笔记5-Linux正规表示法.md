@@ -33,7 +33,7 @@
 
 ## 3 示例
 
-grep 语法：
+### grep 语法：
 
 ```shell
 [root@www ~]# grep [-acinv] [--color=auto] '搜寻字符串' filename
@@ -111,7 +111,7 @@ grep -vn 'the' regular_express.txt
 
 说明： `^` 符号是在 `''` 中的，不是 `[^]` 。
 
-### 3.7 行尾过滤('$')
+### 3.7 行尾过滤(')
 
 使用 `$` 对行尾过滤。
 
@@ -137,7 +137,7 @@ root@www ~]# grep -n '\.$' regular_express.txt
 - `oo*` 代表至少有一个o,即o, oo, ooo, oooo...都可能出现。
 - `ooo*` 代表至少有两个o，即oo,ooo,oooo....
 
-### 3.10  限定连续字符范围({})
+### 3.10 限定连续字符范围({})
 
 `{}` 来限定字符个数，由于 `{}` 在shell中有特殊意义，所以我们需要使用转义字符 `\` 来修饰 `{}` 。
 
