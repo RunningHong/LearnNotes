@@ -12,6 +12,7 @@
 4. 如果读到一个`Enter`符号，就尝试开始执行命令；
 5. 如果一行内容太多，可以使用 `\Enter` 来延伸到下一行；
 6. `#` 作为注释， `#` 后面的信息将被忽略。
+7. 在bash中用一个 `=` 或者用两个 `=` 进行值比较是一样的。
 
 ## 2 执行script
 
@@ -27,7 +28,7 @@
    - 通过 `source` 来执行指令（把代码放到父程序执行），执行后script申明的变量变为全局可读取。
 
 
-## 3 script的一些命令
+## 3 script的一些指令
 
 ### 3.1 打印信息（echo）
 
@@ -44,7 +45,7 @@
 
 ### 3.3 测试（test）
 
-`test` 指令告诉我们是exist还是not exist
+`test` 指令告诉我们是exist还是not exist，也可以使用 `[ 判断语句 ]` 来代替 `test`
 
 #### 3.3.1 档案**文件类型**判断
 
@@ -118,6 +119,148 @@
 | -a   | (and)两状况同时成立！例如 test -r file -a -x file，则 file 同时具有r 与 x 权限时，才回传 true。 |
 | -o   | (or)两状况任何一个成立！例如 test -r file -o -x file，则 file 具有 r或 x 权限时，就可回传 true。 |
 | !    | 相反状态，如 test ! -x file ，当 file 不具有 x 时，回传 true |
+
+### 3.4 条件判断语句
+
+#### 3.4.1 简单条件判断（if）
+
+```shell
+# 语法
+if [ 条件判断式 ]; then
+	当条件判断成立时，可以进行的指令工作内容；
+fi <==将 if 反过来写，就成为 fi 啦！结束 if 之意！
+```
+
+#### 3.4.2 多重条件判断（if...else）
+
+```shell
+# 一个条件判断，分成功与失败进行 (else)
+if [ 条件判断式 ]; then
+	当条件判断式成立时，可以进行的指令工作内容；
+else
+	当条件判断式不成立时，可以进行的指令工作内容；
+fi
+
+
+# 多个条件判断 (if ... elif ... elif ... else) 分多种不同情况执行
+if [ 条件判断式一 ]; then
+	当条件刞断式一成立时，可以进行的指令工作内容；
+elif [ 条件判断式二 ]; then
+	当条件判断式二成立时，可以进行的指令工作内容；
+else
+	当条件判断式一与二均不成立时，可以进行的指令工作内容；
+fi
+
+# 使用case关键字（示例）
+case $1 in
+"hello")
+	echo "Hello, how are you ?"
+	;;
+"")
+	echo "You MUST input parameters, ex> {$0 someword}"
+	;;
+*) # 其实就相当亍通配符，0~无穷多个任意字符乀意！
+	echo "Usage $0 {hello}"
+	;;
+esac
+```
+
+### 3.5 方法（function）
+
+function的的定义**一定要在程序最前面**，这样才能被程序认出来。
+
+```shell
+function fun() {
+    程序
+}
+```
+
+### 3.6 循环（loop）
+
+#### 3.6.1 使用while
+
+```shell
+# 使用while
+while [ condition ] <==中括号内的状态就是刞断式
+do 			<==do 是循环的开始！
+	程序段落
+done 		<==done 是循环的结束
+
+############# 举例 ##############
+s=0 # 这是加总的数值发数
+i=0 # 这是累计的数值，亦即是 1, 2, 3....
+while [ "$i" != "100" ]
+do
+	i=$(($i+1)) # 每次 i 都会增加 1
+	s=$(($s+$i)) # 每次都会加总一次！
+done
+echo "The result of '1+2+3+...+100' is ==> $s"
+```
+
+#### 3.6.2 使用until
+
+```shell
+# 使用until
+until [ condition ]
+do
+	程序段落
+done
+```
+
+#### 3.6.3 固定循环
+
+```shell
+# 固定循环
+for var in con1 con2 con3 ...
+do
+	程序段
+done
+
+############# 举例 ##############
+for animal in dog cat elephant
+do
+	echo "There are ${animal}s.... "
+done
+```
+
+#### 3.6.4 for循环
+
+```shell
+for (( 刜始值; 限制值; 执行步阶 ))
+do
+	程序段
+done
+
+############# 举例 ##############
+s=0
+for (( i=1; i<=$nu; i=i+1 ))
+do
+	s=$(($s+$i))
+done
+echo "The result of '1+2+3+...+$nu' is ==> $s"
+```
+
+### 3.7 script的debug
+
+```shell
+[root@www ~]# sh [-nvx] scripts.sh
+选项与参数：
+-n ：不要执行 script，仅查询语法的问题；
+-v ：再执行 sccript 前，先将 scripts 的内容输出到屏幕上；
+-x ：将使用到的 script 内容显示到屏幕上，这是很有用的参数！
+
+############# 举例 ##############
+范例一：测试 sh16.sh 有无语法的问题？
+[root@www ~]# sh -n sh16.sh
+# 若语法没有问题，则不会显示任何信息！
+
+范例二：将 sh15.sh 的执行过程全部列出来～
+[root@www ~]# sh -x sh15.sh
+```
+
+
+
+
 
 
 
