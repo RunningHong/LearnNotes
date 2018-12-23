@@ -49,7 +49,7 @@ public ByteArrayOutputStream parse(InputStream in) throws Exception {
 
 ```java
 public ByteArrayInputStream parse(OutputStream out) throws Exception {
-    ByteArrayOutputStream   baos=new   ByteArrayOutputStream();
+    ByteArrayOutputStream   baos=new ByteArrayOutputStream();
     baos=(ByteArrayOutputStream) out;
     ByteArrayInputStream swapStream = new ByteArrayInputStream(baos.toByteArray());
     return swapStream;
