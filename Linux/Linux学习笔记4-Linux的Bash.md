@@ -45,17 +45,18 @@ myName=ddd
 
 为了简化我们的操作，我们可以给常用的命令设置别名，就像window在桌面设置一个快捷方式一样。
 
-使用 `lm` 作为 `ls -al | more` 的快捷键:
-
 ```shell
+# 使用 `lm` 作为 `ls -al | more` 的快捷键:
 [root@www ~]# alias lm='ls -al | more'
-```
 
-**取消** `lm` 这个命令别名：
-
-```shell
+# 取消 `lm` 这个命令别名：
 [root@www ~]# unalias lm
+
+# 当我们把命令和别名取成一样（如：alias ls=ls -al）,我们想使用原先的ls而不是别名，需要使用\
+[root@www ~]# \ls
 ```
+
+
 
 ## 3 bash组合键
 
