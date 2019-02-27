@@ -68,6 +68,176 @@ NIO 的创建目的是为了让 Java 程序员可以实现高速 I/O 而无需�
 
 每一个 `Buffer` 类都是 `Buffer` 接口的一个实例。 除了 `ByteBuffer`，每一个 Buffer 类都有完全一样的操作，只是它们所处理的数据类型不一样。因为大多数标准 I/O 操作都使用 `ByteBuffer`，所以它具有所有共享的缓冲区操作以及一些特有的操作。
 
+## 5 NIO 中的读和写
+
+### 5.1 读和写概述
+
+读和写是 I/O 的基本过程。从一个通道中读取很简单：只需创建一个缓冲区，然后让通道将数据读到这个缓冲区中。写入也相当简单：创建一个缓冲区，用数据填充它，然后让通道用这些数据来执行写入操作。
+
+### 5.2 从文件中读取
+
+如果使用原来的 I/O，那么我们只需创建一个 `FileInputStream` 并从它那里读取。而在 NIO 中，情况稍有不同：我们首先从 `FileInputStream` 获取一个 `Channel` 对象，然后使用这个通道来读取数据。
+
+使用NIO读取文件步骤：
+
+1. 从 `FileInputStream` 获取 `Channel`
+2. 创建 `Buffer`
+3. 将数据从 `Channel` 读到 `Buffer`
+
+```java
+// 第一步：获取通道。我们从 FileInputStream 获取通道：
+FileInputStream fin = new FileInputStream( "filePath" );
+
+FileChannel fc = fin.getChannel();
+
+// 第二步：创建缓冲区
+ByteBuffer buffer = ByteBuffer.allocate( 1024 );
+
+// 最后一步：将数据从通道读到缓冲区中
+fc.read( buffer );
+```
+
+### 5.3 写入文件
+
+在 NIO 中写入文件类似于从文件中读取。
+
+使用NIO写入文件步骤：
+
+1. 从 `FileOutputStream` 获取一个通道
+2. 创建一个缓冲区并在其中放入一些数据
+3. 最后一步是写入缓冲区中
+
+```java 
+// 首先从 FileOutputStream 获取一个通道：
+FileOutputStream fout = new FileOutputStream( "filePath" );
+FileChannel fcout = fout.getChannel();
+
+// 下一步是创建一个缓冲区并在其中放入一些数据
+ByteBuffer buffer = ByteBuffer.allocate( 1024 );
+
+String message = "Some bytes";
+byte[] messageBytes = message.getBytes();
+
+for (int i = 0; i < messageBytes.length; ++i) {
+	buffer.put(messageBytes[i]);
+}
+buffer.flip();
+
+// 最后一步是写入缓冲区中：
+fcout.write( buffer );
+```
+
+### 5.4 读写结合（copy文件）
+
+```java
+// 获取input的通道。我们从 FileInputStream 获取通道：
+FileInputStream fin = new FileInputStream( "inputFilePath" );
+FileChannel fcin = fin.getChannel();
+
+// 获取output的通道
+FileOutputStream fout = new FileOutputStream("outputFilePath");
+FileChannel fcout = fout.getChannel();
+
+// 创建缓冲区
+ByteBuffer buffer = ByteBuffer.allocate( 1024 );
+
+// 循环读取文件，直到文件读取完毕
+while (true) {
+     // 调用clear()，清空缓存空间
+     buffer.clear();
+    
+     // 数据从通道读到管道中，返回一个值，为-1时代表文件结束
+     int r = fcin.read( buffer );
+ 
+     if (r==-1) {
+       break;
+     }
+ 
+     // 调用flip(),将buffer内部的指针limit置为position的大小，position置为0，从而写文件
+     buffer.flip();
+     fcout.write( buffer );
+}
+```
+
+## 6 缓冲区内部细节
+
+ NIO 中两个重要的缓冲区组件：状态变量和访问方法 (accessor)。
+
+状态变量是的"内部统计机制"的关键。每一个读/写操作都会改变缓冲区的状态。通过记录和跟踪这些变化，缓冲区就可能够内部地管理自己的资源。
+
+在从通道读取数据时，数据被放入到缓冲区。在有些情况下，可以将这个缓冲区直接写入另一个通道，但是在一般情况下，您还需要查看数据。这是使用*访问方法* `get()` 来完成的。同样，如果要将原始数据放入缓冲区中，就要使用访问方法 `put()`。
+
+### 6.1 状态变量
+
+可以用三个值指定缓冲区在任意时刻的状态：
+
+- `position`
+- `limit`
+- `capacity`
+
+这三个变量一起可以跟踪缓冲区的状态和它所包含的数据。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
