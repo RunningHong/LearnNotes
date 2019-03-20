@@ -57,6 +57,7 @@ stash相关(类似栈结构)
 - `git remote -v` 查看**远程地址**。
 - `git remote rm origin` 删除已关联的名为origin的远程库（绑定错地址时使用）。
 - `git config --global color.ui auto` 获得彩色输出。
+- `ssh-keygen -t rsa -C "youremail"`  生成ssh key，后续直接回车，可以看见生成的路径（公钥为.pub文件）
 
 
 
