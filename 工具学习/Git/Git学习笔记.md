@@ -7,19 +7,13 @@
 基础
 
 - `git status` 查看状态。
-
 - `git add` 把文件**添加**到仓库。
-
 - `git commit -m "xxx"` 把文件**提交**到仓库，并添加注释“xxx”。
-
 - `git push origin master` 将提交的文件push到远程库origin的master主分支上。
-
-- `git log` 查看历史记录。
-
+- `git log` 查看当前版本库及其之前的所有commit 
+- `git reflog` 查看从本地仓库创建之日起，本地所进行的与项目更改有关的操作！比如说commit，clone等操作。 
 - `git checkout -- fileName` 可以丢弃工作区的修改。
-
 - `git reset` 回退版本。
-
 - `git rm fileName` 从版本库中删除文件。
 
 
