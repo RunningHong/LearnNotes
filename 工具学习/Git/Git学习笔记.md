@@ -4,7 +4,7 @@
 
 ## 1 常用命令
 
-基础
+### 1.1 基础
 
 - `git status` 查看状态。
 - `git add` 把文件**添加**到仓库。
@@ -15,10 +15,10 @@
 - `git checkout -- fileName` 可以丢弃工作区的修改。
 - `git reset` 回退版本。
 - `git rm fileName` 从版本库中删除文件。
+- `git diff` 对比工作区(自己平时工作的地方)与暂存区(add后的地方)。
+- `git diff --stage` 或者 `git diff --cached` 对比暂存区（add后的代码）与本地仓库（commit后的代码）。
 
-
-
-分支相关
+### 1.2 分支相关
 
 - `git branch dev` 创建dev分支。
 - `git chechout dev` 切换到dev分支。
@@ -27,16 +27,25 @@
 - `git merge 分支名` 将需要合并的分支和合并到当前分支。
 - `git branch -d 分支名` 删除该分支。
 - `git log --graph` 查看分支合并图。
+- `git branch -v` 查看分支的详细信息（分支名，最近一次提交的注释信息）
 
 
 
-stash相关(类似栈结构)
+### 1.3 stash相关(类似栈结构)
 
 - `git stash` 把当前工作现场“储藏”起来，等以后恢复现场后继续工作
 - `git stash list` 查看已有的工作现场（包括隐藏的现场）
 - `git stash apply` 恢复最近的现场，恢复后stash内容并不删除。
 - `git stash drop` 删除最近的现场。
 - `git stash pop` 恢复现场，并删除备份的现场。
+
+
+
+### 1.4 拉取代码命令（fetch、merge、pull）
+
+- `git fetch` 拉取远程仓库到本地仓库。
+- `git merge` 合并分支。
+- `git pull` 拉取远程仓库到本地仓库并合并到本地分支（相当于：`git fetch + git merge`）
 
 
 
@@ -52,8 +61,6 @@ stash相关(类似栈结构)
 - `git remote rm origin` 删除已关联的名为origin的远程库（绑定错地址时使用）。
 - `git config --global color.ui auto` 获得彩色输出。
 - `ssh-keygen -t rsa -C "youremail"`  生成ssh key，后续直接回车，可以看见生成的路径（公钥为.pub文件）
-
-
 
 ## 3 忽略文件的使用（.gitignore）
 
