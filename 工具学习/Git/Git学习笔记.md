@@ -2,6 +2,12 @@
 
 # Git学习笔记
 
+
+
+工作区    (add操作) -->     暂存区   （commit操作）-->      本地仓库     (push操作) -->      远程仓库
+
+
+
 ## 1 常用命令
 
 ### 1.1 基础
@@ -47,7 +53,15 @@
 - `git merge` 合并分支。
 - `git pull` 拉取远程仓库到本地仓库并合并到本地分支（相当于：`git fetch + git merge`）
 
+### 1.5 reset命令
 
+- `git reset --mixed HEAD~` 与 `git reste HEAD~` 将本地仓库的上一个版本覆盖到暂存区
+- `git reset --hard HEAD~` 将本地仓库的上一个版本覆盖到暂存区和工作区。（谨慎使用，不可逆）
+- `git reset --soft HEAD~` 将HEAD的指针指向上一个版本。
+
+### 1.6 revert命令
+
+撤销这次提交。
 
 
 ## 2 不常用命令
