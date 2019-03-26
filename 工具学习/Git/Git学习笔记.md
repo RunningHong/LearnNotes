@@ -6,6 +6,8 @@
 
 工作区    (add操作) -->     暂存区   （commit操作）-->      本地仓库     (push操作) -->      远程仓库
 
+![pIC](https://segmentfault.com/img/bVFcx8?w=800&h=227)
+
 
 
 ## 1 常用命令
@@ -17,6 +19,7 @@
 - `git commit -m "xxx"` 把文件**提交**到仓库，并添加注释“xxx”。
 - `git push origin master` 将提交的文件push到远程库origin的master主分支上。
 - `git log` 查看当前版本库及其之前的所有commit 
+- `git log --pretty=oneline` 作用同 `git log` 不过显示的东西更好看，更容易辨识。
 - `git reflog` 查看从本地仓库创建之日起，本地所进行的与项目更改有关的操作！比如说commit，clone等操作。 
 - `git checkout -- fileName` 可以丢弃工作区的修改。
 - `git reset` 回退版本。
