@@ -70,3 +70,49 @@ Thread.sleep()方法调用目的是不让当前线程独自霸占该进程所获
 
 ## 2 实现java.lang.Runnable接口
 
+```java
+public class ImplsRunnable implements Runnable {
+
+	Logger log = LoggerFactory.getLogger(ImplsRunnable.class);
+
+	public static void main(String[] args) {
+		Thread thread1 = new Thread(new ImplsRunnable("C"));
+		Thread thread2 = new Thread(new ImplsRunnable("D"));
+
+		thread1.start();
+		thread2.start();
+	}
+
+	private String name;
+
+	public ImplsRunnable(String name) {
+		this.name = name;
+	}
+
+
+	@Override
+	public void run() {
+		for (int i = 0; i < 5; i++) {
+			System.out.println(name + "运行  :  " + i);
+			try {
+				Thread.sleep((int) Math.random() * 10);
+			} catch (InterruptedException e) {
+				log.error("错误", e.getMessage());
+			}
+		}
+	}
+}
+```
+
+## 3 Thread和Runnable的区别
+
+实现Runnable接口比继承Thread类所具有的优势：
+
+1）：适合多个相同的程序代码的线程去处理同一个资源
+
+2）：可以避免java中的单继承的限制
+
+3）：增加程序的健壮性，代码可以被多个线程共享，代码和数据独立
+
+4）：线程池只能放入实现Runable或callable类线程，不能直接放入继承Thread的类
+
