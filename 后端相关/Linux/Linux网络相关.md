@@ -6,7 +6,7 @@
 
 参数：
 
-​	-X指定requestde method，如GET POST等
+​	-X指定requests的 method，如GET POST等
 
 ​	-H指定请求的headr,如“contetn-type:application/json"
 
