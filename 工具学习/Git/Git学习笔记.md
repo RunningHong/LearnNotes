@@ -72,6 +72,7 @@
 - `git init`  把当前目录变成Git可以管理的仓库。
 - `git config --global user.name "Your Name" ` 给本地的Git取名字。
 - `git config --global user.email "email@example.com"` 给本地Git绑定邮箱。
+- `git config --global core.quotepath off`  避免git status显示的中文文件名乱码
 - `git clone git@server-name:path/repo-name.git` 把仓库文件**clone**到本地。
 - `git remote add origin git@server-name:path/repo-name.git` 添加**远程库**。
 - `git remote -v` 查看**远程地址**。
