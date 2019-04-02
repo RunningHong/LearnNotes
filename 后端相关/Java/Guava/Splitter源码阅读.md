@@ -58,7 +58,7 @@ Splitter采用了策略模式，而且表达的很精妙。如：
 
 ## 3 策略接口
 
-```jav
+```java
 private interface Strategy {
     Iterator<String> iterator(Splitter var1, CharSequence var2);
 }

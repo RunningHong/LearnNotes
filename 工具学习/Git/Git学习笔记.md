@@ -21,7 +21,7 @@
 - `git log` 查看当前版本库及其之前的所有commit 
 - `git log --pretty=oneline` 作用同 `git log` 不过显示的东西更好看，更容易辨识。
 - `git reflog` 查看从本地仓库创建之日起，本地所进行的与项目更改有关的操作！比如说commit，clone等操作。 
-- `git checkout -- fileName` 可以丢弃工作区的修改。
+- `git checkout -- fileName` 可以丢弃工作区的修改。就是让这个文件回到最近一次`git commit`或`git add`时的状态。
 - `git reset` 回退版本。
 - `git rm fileName` 从版本库中删除文件。
 - `git diff` 对比工作区(自己平时工作的地方)与暂存区(add后的地方)。
@@ -65,6 +65,21 @@
 ### 1.6 revert命令
 
 撤销这次提交。并且产生一个新的提交。
+
+### 1.7 撤销修改
+
+1. `git checkout -- <文件名>`：丢弃工作区的修改，就是让这个文件回到最近一次`git commit`或`git add`时的状态。
+2. `git reset HEAD <文件名>`：把暂存区的修改撤销掉（unstage），重新放回工作区。
+3. `git reset --hard commit_id`:git版本回退，回退到特定的commit_id版本
+   - 流程：
+   - `git log`查看提交历史，以便确定要回退到哪个版本(commit 之后的即为ID);
+
+4.`git reflog`查看命令历史，以便确定要回到未来的哪个版本;
+
+- 更新远程代码到本地
+  `git fetch origin master(分支)`
+  `git pull // 将fetch下来的代码pull到本地`
+  `git diff master origin/master // 查看本地分支代码和远程仓库的差异`
 
 
 ## 2 不常用命令
