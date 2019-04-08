@@ -7,9 +7,10 @@
 **一、设计表，写出建表语句(我给出的字段内容、名称仅供参考，各位同学可以按照自己的设计建表) 考察点：对字段定义的掌握，对字段类型的选择掌握**
 
 ```sql
-# 整体说明：作者书写图书，图书可以获奖
+#导师，我再细想了一下，确实感觉设计有点问题。我原来的奖项想法（如矛盾文学奖下面还有金奖、银奖、一等奖、#二等奖、优秀奖...，即奖项的全称有矛盾文学金奖、矛盾文学银奖..，所以我认为在这会有冗余.）,在现实生活
+#中图书的奖项应该就只有一种那就是矛盾文学奖。对现实场景忽略了。
 
-# 图书表(图书表存储图书信息)
+# 图书表
 # 说明:早期的ISBN一共有10位，现在扩展到了13位,所以为了兼容book_id设置为varchar(13)
 create table book (
 	id int(11) unsigned not null auto_increment comment '自增主键',
@@ -22,26 +23,17 @@ create table book (
     primary key (`id`)
 ) engine=InnoDB auto_increment=1 default CHARSET=utf8 COMMENT='图书表';
 
-# 奖项表（奖项表存储奖项信息）
+# 奖项表
 create table cup (
     id int(11) unsigned not null auto_increment comment '自增主键',
-    cup_id int(11) not null default '0' comment '奖项的id',
-    cup_name varchar(50) not null default '' comment '奖项名称',
-    primary key (`id`)
-) engine=InnoDB auto_increment=1 default CHARSET=utf8 COMMENT='奖项表';
-
-
-# 获奖表（获奖表存储获奖图书以及获奖时间、类型等信息）
-create table reward (
-	id int(11) unsigned not null auto_increment comment '自增主键',
-    cup_id int(11) not null default '0' comment '奖项id',
-    book_id varchar(13) not null default '' comment '获奖图书id',
+    book_id varchar(13) not null default '' comment '图书id,即ISBN',
+	author_id int(11) unsigned not null default '0' comment '作者id',
     cup_type varchar(20) not null default '' comment '奖项类型',
     cup_time datetime not null default '2019-01-01 00:00:00' comment '发奖时间',
     primary key (`id`)
-)  engine=InnoDB auto_increment=1 default CHARSET=utf8 COMMENT='获奖表';
+) engine=InnoDB auto_increment=1 default CHARSET=utf8 COMMENT='奖项表';
 
-# 作者表 （存储作者信息）
+# 作者表
 create table author (
 	id int(11) unsigned not null auto_increment comment '自增主键',
     author_id int(11) unsigned not null default '0' comment '作者id',
@@ -55,14 +47,12 @@ create table author (
 
 ```sql
 # book的索引
-alter table book add unique index uniq_book_id(book_id);
+alter table book add index ind_book_id(book_id);
+alter table book add index ind_author_id(author_id);
 
 # cup的索引
-alter table cup add unique index uniq_book_id(cup_id);
-
-# reward的索引
-alter table reward add index ind_cup_id(cup_id);
-alter table reward add index ind_book_id(book_id);
+alter table cup add index ind_book_id(book_id);
+alter table cup add index ind_author_id(author_id);
 
 # author的索引
 alter table author add index ind_author_id(author_id);
@@ -81,84 +71,65 @@ insert into book(book_id,author_id,book_name,pages,price,press) values
 ("0000000003", "3","图书3","52",'45','出版社3'),
 ("0000000004", "1","图书4","123",'42','出版社3');
 
-insert into cup(cup_id,cup_name) values
-('1','图书奖1'),
-('2','图书奖2'),
-('3','图书奖3');
-
-insert into reward(cup_id,book_id,cup_type,cup_time) values
+insert into cup(author_id,book_id,cup_type,cup_time) values
 ('1','0000000001','金奖','2019-02-02 12:00:000'),
-('2','0000000002','银奖','2018-02-02 12:00:000'),
-('3','0000000001','银奖','2018-02-02 12:00:000'),
-('4','0000000004','金奖','2018-02-02 12:00:000');
+('1','0000000002','银奖','2018-02-02 13:00:000'),
+('2','0000000001','银奖','2019-03-02 11:00:000'),
+('3','0000000004','金奖','2018-09-02 12:00:000'),
+('1','0000000001','铜奖','2019-02-02 12:00:000');
 ```
 
 **三、完成以下SQL**
 
+图书表 id book_id author_id book_name pages price press
+奖项表 id book_id author_id cup_type cup_time
+作者表 id author_id author_name content
+
 1. **查询姓王的作者有多少**
 
    ```sql
-   select count(*) as num from author where author.author_name like '王%';
+   select count(*) as author_num from author where author.author_name like '王%';
    ```
 
 2. **查询获奖作者总人数**
 
    ```sql
-   # 由于一本图书可以有多个作者，而且一个作者可以有多本图书。
-   # 我认为获奖作者总数指的所有获奖了的作者（不计算重复获奖）
-   select 
-   	count(distinct author.author_id) as num 
-   from reward 
-   left join book on reward.book_id=book.book_id
-   right join author on author.author_id = book.author_id;
+   # 作者不重复
+   select count(distinct author_id) as total_num from cup;
    ```
 
 3. **查询同时获得过金奖、银奖的作者姓名**
 
    ```sql
-   # 1.子查询列出所有获奖情况（人获了什么奖，如果获金奖就把gloden_num置位1，silver_num置位1）
-   # 2.在1的基础上通过聚合筛选既获得金奖又获得银奖的人
-   select author_name from (
-       select author.author_name,
-           reward.cup_type,
-           if(reward.cup_type='金奖',1,0) gloden_num, # 金奖个数
-           if(reward.cup_type='银奖',1,0) silver_num # 银奖个数
-       from reward  
-       left join book on reward.book_id=book.book_id
-       right join author on author.author_id = book.author_id 
-       where reward.id is not null
-   ) as author_cuptype 
-   group by author_name 
-   having sum(gloden_num)>0 and sum(silver_num)>0;
+   # 首先过滤只剩下金奖银奖的人，再通过group by以及having留下拥有两种类型奖项的人
+   select 
+   	author.author_name
+   from cup
+   left join author on cup.author_id = author.author_id
+   where cup.cup_type='金奖' || cup.cup_type='银奖'
+   group by author.author_id
+   having count(cup.cup_type) = 2;
    ```
 
 4. **查询获得过金奖的图书有多少本，银奖的有多少本**
 
    ```sql
-   # 1.子查询列出所有获奖情况
-   # 2.计算金奖个数，银奖个数
-   select 
-   	sum(gloden_num) as gloden_num, # 获得金奖的个数 
-   	sum(silver_num) as silver_num  # 获得银奖的个数
-   from (
-       select reward.id as reward_id,
-           if(reward.cup_type='金奖',1,0) gloden_num, # 金奖个数
-           if(reward.cup_type='银奖',1,0) silver_num # 银奖个数
-       from reward  
-       where reward.id is not null
-   ) as author_cuptype;
+   # 首先过滤只剩下金奖银奖，再利用count不统计null的特性对金奖银奖图书进行统计
+   select
+   	count(if(cup_type='金奖', id, null)) as goloden_num,
+   	count(if(cup_type='银奖', id, null)) as silver_num
+   from cup
+   where cup.cup_type='金奖' || cup.cup_type='银奖';
    ```
 
 5. **查询最近一年内获过奖的作者姓名**
 
    ```sql
    select 
-   	author.author_name,
-   	reward.cup_time
-   from reward 
-   left join book on reward.book_id=book.book_id
-   right join author on author.author_id = book.author_id
-   where reward.id is not null and reward.cup_time >= date_sub(CURDATE(),INTERVAL 1 YEAR);
+   	author_name
+   from author
+   left join cup ON author.author_id = cup.author_id
+   WHERE cup.cup_time >= date_sub(curdate(),interval 1 YEAR);
    ```
 
 四、
@@ -211,20 +182,4 @@ insert into reward(cup_id,book_id,cup_type,cup_time) values
    ```
 
 考察点：对索引设计的理解，对字段长度含义的理解，对字符集影响的理解，对覆盖索引概念的理解
-
-
-
-导师我关联表的目的是：
-
-reward表关联了book表（只有图书能获奖），book表还关联了author表（一本图书可能有多个作者），所以需要通过reward->book->author才能找到谁获奖了，之后我认为获奖作者总数指的所有获奖了的作者（不计算重复获奖）所以使用了distinct
-
-
-
-图书表 id book_id author_id book_name pages price press
-奖项表 id book_id author_id cup_type cup_time
-作者表 id author_id author_name content
-
-
-
-导师，我再细想了一下，确实感觉设计有点问题。我原来的奖项想法（如矛盾文学奖下面还有金奖、银奖、一等奖、二等奖、优秀奖...，即奖项的全称有矛盾文学金奖、矛盾文学银奖..，所以我认为在这会有冗余.）,在现实生活中图书的奖项应该就只有一种那就是矛盾文学奖。建表要结合现实。
 
