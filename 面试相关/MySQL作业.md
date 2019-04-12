@@ -228,3 +228,17 @@ reward表关联了book表（只有图书能获奖），book表还关联了author
 
 导师，我再细想了一下，确实感觉设计有点问题。我原来的奖项想法（如矛盾文学奖下面还有金奖、银奖、一等奖、二等奖、优秀奖...，即奖项的全称有矛盾文学金奖、矛盾文学银奖..，所以我认为在这会有冗余.）,在现实生活中图书的奖项应该就只有一种那就是矛盾文学奖。建表要结合现实。
 
+
+
+
+
+```mysql
+create table fresh_user (
+	id int(11) unsigned not null auto_increment comment '自增主键',
+    user_name varchar(50) not null default '' comment '姓名',
+    password varchar(50) not null default '' comment '密码',
+    nick_name varchar(50) not null default '' comment '昵称',
+    primary key (`id`)
+) engine=InnoDB auto_increment=1 default CHARSET=utf8 COMMENT='用户表';
+```
+

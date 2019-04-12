@@ -114,6 +114,8 @@ task makeWebDir() {
 
 setting.gradle用于多项目构建，管理当前的项目有哪些子项目。
 
+这个和Maven的父子工程相似。
+
 ```groovy
 // 项目名称
 rootProject.name = “projectName”
