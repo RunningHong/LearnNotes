@@ -242,3 +242,22 @@ create table fresh_user (
 ) engine=InnoDB auto_increment=1 default CHARSET=utf8 COMMENT='用户表';
 ```
 
+
+
+
+
+```sql
+create table fresh_user (
+  id int unsigned not null auto_increment comment '主键',
+  name varchar(100) not null default '' comment '姓名',
+  sex varchar(1) not null default '' comment '性别',
+  age int signed not null default 0 comment '年龄',
+  remark varchar(200) not null default '' comment '备注',
+  state tinyint not null default 1 comment '是否可用，0代表不可用，1代表可用',
+  create_time timestamp not null default '0000-00-00 00:00:00' comment '创建时间',
+  update_time timestamp not null default '0000-00-00 00:00:00' on update CURRENT_TIMESTAMP comment '更新时间',
+  PRIMARY KEY (id),
+  UNIQUE KEY uniq_name (name)
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
+```
+
