@@ -1,3 +1,5 @@
+
+
 [TOC]
 
 # cookies&session
@@ -133,3 +135,146 @@ response.addCookie(cookie);
 Cookie[] cookies = request.getCookies();
 ```
 
+## 4 session
+
+session也可以保持状态信息不过相对cookie session是以**服务端**保存状态的。
+
+### 4.1 session机制
+
+当客户端请求创建一个session的时候，服务器会先检查这个客户端的请求里是否已包含了一个session标识 - sessionId，
+
+- 如果已包含这个sessionId，则说明以前已经为此客户端创建过session，服务器就按照sessionId把这个session检索出来使用（如果检索不到，可能会新建一个）
+- 如果客户端请求不包含sessionId，则为此客户端创建一个session并且生成一个与此session相关联的sessionId
+
+sessionId的值一般是一个既不会重复，又不容易被仿造的字符串，这个sessionId将被在本次响应中返回给客户端保存。**保存sessionId的方式大多情况下用的是cookie。**
+
+### 4.2 HttpSession接口
+
+```java
+public interface HttpSession {
+    /**
+     * 返回session的创建时间
+     */
+    public long getCreationTime();
+    
+    /**
+     * 返回一个sessionId,唯一标识
+     */
+    public String getId();
+    
+    /**
+     *返回客户端最后一次发送与该 session 会话相关的请求的时间
+     *自格林尼治标准时间 1970 年 1 月 1 日午夜算起，以毫秒为单位。
+     */
+    public long getLastAccessedTime();
+    
+    /**
+     * 返回当前session所在的ServletContext
+     */
+    public ServletContext getServletContext();
+
+    public void setMaxInactiveInterval(int interval);
+
+    /**
+     * 返回 Servlet 容器在客户端访问时保持 session
+     * 会话打开的最大时间间隔
+     */
+    public int getMaxInactiveInterval();
+    
+    public HttpSessionContext getSessionContext();
+
+    /**
+     * 返回在该 session会话中具有指定名称的对象，
+     * 如果没有指定名称的对象，则返回 null。
+     */
+    public Object getAttribute(String name);
+    
+    public Object getValue(String name);
+
+    /**
+     * 返回 String 对象的枚举，String 对象包含所有绑定到该 session
+     * 会话的对象的名称。
+     */    
+    public Enumeration<String> getAttributeNames();
+    
+    public String[] getValueNames();
+
+    public void setAttribute(String name, Object value);
+
+    public void putValue(String name, Object value);
+
+    public void removeAttribute(String name);
+
+    public void removeValue(String name);
+
+    /**
+     * 指示该 session 会话无效，并解除绑定到它上面的任何对象。
+     */
+    public void invalidate();
+    
+    /**
+     * 如果客户端不知道该 session 会话，或者如果客户选择不参入该
+     * session 会话，则该方法返回 true。
+     */
+    public boolean isNew();
+}
+```
+
+### 4.3 创建session
+
+```java
+// 1、创建Session对象
+HttpSession session = request.getSession(); 
+```
+
+如果session不存在，就新建一个；如果是false的话，标识如果不存在就返回null；
+
+### 4.4 session生命周期
+
+session的生命周期指的是从Servlet容器创建session对象到销毁的过程。Servlet容器会依据session对象设置的存活时间，在达到session时间后将session对象销毁。session生成后，只要用户继续访问，服务器就会更新session的最后访问时间，并维护该session。
+
+### 4.5 session的有效期
+
+session一般在内存中存放，内存空间本身大小就有一定的局限性，因此session需要采用一种**过期删除**的机制来确保session信息不会一直累积，来防止内存溢出的发生。
+
+session的超时时间可以通过maxInactiveInterval属性来设置。
+
+如果想让session失效的话，也可以当通过invalidate()来完成。
+
+## 5 关于鉴权
+
+### 5.1 使用session
+
+session认证主要分四步： 
+
+1. 服务器在接受客户端首次访问时在服务器端创建seesion，然后保存seesion(我们可以将seesion保存在内存中，也可以保存在redis中)，然后给这个session生成一个唯一的标识字符串（sessionId）,然后在响应头中种下这个唯一标识字符串。 
+2. 签名。这一步只是对sid进行加密处理，服务端会根据这个secret密钥进行解密。（非必需步骤） 
+3. 浏览器中收到请求响应的时候会解析响应头，然后将sessionId保存在本地cookie中，浏览器在下次http请求的请求头中会带上**该域名下的cookie信息**。
+4. 服务器在接受客户端请求时会去解析请求头cookie中的sessionId，然后根据这个sessionId去找服务器端保存的该客户端的session，然后判断该请求是否合法。
+
+**session其实也是使用了cookie的，所以浏览器禁用cookie会使session保持状态信息失败。**
+
+sessionId是存放在服务器的（可通过redis保存等）。因为客户端每次请求带的token/sessionId都需要去Redis里查找看是否存在且有效，无效就无法访问了，是否有效由后台决定，失效操作可以进行逻辑删除或物理删除。
+
+### 5.2 使用Token验证
+
+使用基于 Token 的身份验证方法，大概的流程是这样的：
+
+    1. 客户端使用用户名跟密码请求登录 
+    2. 服务端收到请求，去验证用户名与密码 
+    3. 验证成功后，服务端会签发一个 Token，再把这个 Token 发送给客户端 
+    4. 客户端收到 Token 以后可以把它存储起来，比如放在 Cookie 里或者 Local Storage 里 
+    5. 客户端每次向服务端请求资源的时候需要带着服务端签发的 Token 
+    6. 服务端收到请求，然后去验证客户端请求里面带着的 Token，如果验证成功，就向客户端返回请求的数据
+
+这样一看流程感觉和session差不多，感觉就是使用Token代替了sessionId，但其实这里面的差别还是有的：
+
+- sessionId是一个由服务器生成的字符串，服务端是根据这个字符串，来查询在服务器端保持的seesion，**这里面才保存着用户的登陆状态（就是说有sessionId不一定就是成功的，需要验证是否是这个session）**。但是**token本身就是一种登陆成功凭证（只有登录成功了才会有token出现）**，它是在登陆成功后根据某种规则生成的一种信息凭证，他里面本身就保存着用户的登陆状态。服务器端只需要根据定义的规则校验这个token是否合法就行（通过这的再次验证可以实现会话过期等功能）。
+- session是需要cookie配合的，cookie只有在浏览器才会去解析响应头的cookie（在一些原生的APP中cookie就不起作用了、浏览器禁止使用cookie也会导致session保持状态信息）；使用token可以存放在cookie、local strage、内存中，所以选择相对较多，可以在很多情况使用token。
+- 时间层面上：session-cookie的sessionid实在登陆的时候生成的而且在登出事时一直不变的，在一定程度上安全就会低，而token是可以在一段时间内动态改变的（服务端改变验证规则等使token改变）。 
+
+### 5.3 方式选择
+
+token自校验这种方式更适用于开放平台，类似微信这种，在token中加入信息去校验调用者是否符合要求，同时权限范围也在token中有指定。
+
+查表校验更适用于指定的服务/app，有token/sessionId就可以执行此用户的所有操作。
