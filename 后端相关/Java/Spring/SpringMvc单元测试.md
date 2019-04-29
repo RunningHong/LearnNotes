@@ -97,6 +97,19 @@ public class UserControllerTest {
 
 		log.info("结果：{}", result);
 	}
+    
+    	@Test
+	public void getTotalNumTest() throws Exception {
+		// 发送请求，post：请求地址;accept
+		MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders
+				.get("/user/getTotalNum")  // 发送get请求
+				.accept(MediaType.APPLICATION_JSON)).andReturn();
+
+		// 使用@ResponseBody注解修饰Controller时可使用getResponse().getContentAsString()获取响应body中的json内容
+		String result = mvcResult.getResponse().getContentAsString();
+
+		log.info("结果：{}", result);
+	}
 
 }
 
