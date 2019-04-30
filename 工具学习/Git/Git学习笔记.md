@@ -33,7 +33,9 @@
 - `git chechout dev` 切换到dev分支。
 - `git checkout -b 分支名`  创建分支并切换到该分支。
 - `git branch` 查看当前分支。
-- `git merge 分支名` 将需要合并的分支和合并到当前分支。
+- `git merge f1` 将`f1`分支和合并到当前分支。
+  `git merge f1 f2` 将`f1`分支合并到`f2`分支。
+  (如： `git merge f1 master`：将`f1`分支合并到`master`分支 )
 - `git branch -d 分支名` 删除该分支。
 - `git log --graph` 查看分支合并图。
 - `git branch -v` 查看分支的详细信息（分支名，最近一次提交的注释信息）
@@ -53,7 +55,9 @@
 ### 1.4 拉取代码命令（fetch、merge、pull）
 
 - `git fetch` 拉取远程仓库到本地仓库。
-- `git merge` 合并分支。
+- `git merge f1` 将`f1`分支和合并到当前分支。
+  `git merge f1 f2` 将`f1`分支合并到`f2`分支。
+  (如： `git merge f1 master`：将`f1`分支合并到`master`分支 )
 - `git pull` 拉取远程仓库到本地仓库并合并到本地分支（相当于：`git fetch + git merge`）
 
 ### 1.5 reset命令
