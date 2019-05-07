@@ -1,6 +1,10 @@
+[TOC]
+
 # SpringMvc单元测试
 
 我们要测试controller层，不能总重启服务器（重启tomcat花费的时间太多），那么我们就用junit4模拟请求，测试controller层的方法。
+
+## 1 单元测试
 
 ```java
 package XXX.controller;
@@ -113,5 +117,28 @@ public class UserControllerTest {
 
 }
 
+```
+
+## 2 关于测试回滚
+
+很多时候我们只是对数据机型测试，当我们不想测试数据写入数据库的时候我们可以使用回滚机制，springMVC的回滚只需在方法头上加上`@Transaction` 注解即可
+
+```java
+    @Test
+    @Transactional // 使用该注解使事务回滚
+    public void changeActiveTest() throws Exception {
+        try {
+            MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders
+                    .post("/model/changeActive")  // 发送post请求
+                    .accept(MediaType.APPLICATION_JSON) // 指定请求的Accept头信息
+                    .param("id", CHANGE_ACTIVE_MODEL_ID) // 指定请求参数
+                    .param("active", CHANGE_ACTIVE_ACTIVE)).andReturn();
+            String result = mvcResult.getResponse().getContentAsString();
+            log.info("结果：{}", result);
+        } catch (Exception e) {
+            log.error("changeActiveTest测试失败", e);
+        }
+
+    }
 ```
 
