@@ -60,6 +60,9 @@ public class UserControllerTest {
 	}
 
 
+    /**
+    * post 请求，就收json格式的参数，方法接收参数使用@RequestBody注解
+    */
 	@Test
 	public void addUserTest() throws Exception {
 		UserModel userModel = new UserModel();
@@ -73,11 +76,11 @@ public class UserControllerTest {
 		ObjectMapper mapper = new ObjectMapper();
 		String postJson = mapper.writeValueAsString(userModel);
 
-		// 发送请求，post：请求地址;accept
 		ResultActions resultActions = this.mockMvc.perform(MockMvcRequestBuilders
-				.post("/user/addUser")  // 发送post请求
-				.accept(MediaType.APPLICATION_JSON) // 指定请求的Accept头信息
-				.param("userModel", postJson)); // 指定请求参数
+				.post("/user/addUser")
+				.accept(MediaType.APPLICATION_JSON) // 设置成功时接收数据的类型
+                .contentType(MediaType.APPLICATION_JSON_UTF8) // 设置contentType
+				.param(postJson)); // 发送json数据
 
 		MvcResult mvcResult = resultActions.andReturn();
 
@@ -87,11 +90,13 @@ public class UserControllerTest {
 		log.info("结果：{}", result);
 	}
 
+    /**
+    * get 请求,方法接收参数被@RequestParam修饰
+    */
 	@Test
 	public void queryTest() throws Exception {
-		// 发送请求，post：请求地址;accept
 		MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders
-				.post("/user/query")  // 发送post请求
+				.get("/user/query") 
 				.accept(MediaType.APPLICATION_JSON) // 指定请求的Accept头信息
 				.param("offset", "0") // 指定请求参数
 				.param("limit", "5")).andReturn();
@@ -104,12 +109,10 @@ public class UserControllerTest {
     
     	@Test
 	public void getTotalNumTest() throws Exception {
-		// 发送请求，post：请求地址;accept
 		MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders
 				.get("/user/getTotalNum")  // 发送get请求
 				.accept(MediaType.APPLICATION_JSON)).andReturn();
-
-		// 使用@ResponseBody注解修饰Controller时可使用getResponse().getContentAsString()获取响应body中的json内容
+		// 获取返回内容
 		String result = mvcResult.getResponse().getContentAsString();
 
 		log.info("结果：{}", result);
