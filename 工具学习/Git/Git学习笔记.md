@@ -42,17 +42,15 @@
 - `git log --graph` 查看分支合并图。
 - `git branch -v` 查看分支的详细信息（分支名，最近一次提交的注释信息）
 
+### 1.3 暂存stash相关(类似栈结构)
 
-
-### 1.3 stash相关(类似栈结构)
+用来暂存当前正在进行的工作，比如想pull 最新代码又不想commit， 或者另为了修改一个紧急的bug,先stash,使返回到自己上一个commit, 改完bug之后再stash pop, 继续原来的工作；
 
 - `git stash` 把当前工作现场“储藏”起来，等以后恢复现场后继续工作
 - `git stash list` 查看已有的工作现场（包括隐藏的现场）
 - `git stash apply` 恢复最近的现场，恢复后stash内容并不删除。
 - `git stash drop` 删除最近的现场。
 - `git stash pop` 恢复现场，并删除备份的现场。
-
-
 
 ### 1.4 拉取代码命令（fetch、merge、pull）
 
@@ -82,10 +80,11 @@
 
 4.`git reflog`查看命令历史，以便确定要回到未来的哪个版本;
 
-- 更新远程代码到本地
-  `git fetch origin master(分支)`
-  `git pull // 将fetch下来的代码pull到本地`
-  `git diff master origin/master // 查看本地分支代码和远程仓库的差异`
+### 1.8 查看本地分支代码和远程仓库的差异
+
+`git fetch origin master(分支)`
+`git pull // 将fetch下来的代码pull到本地`
+`git diff master origin/master // 查看本地分支代码和远程仓库的差异`
 
 
 ## 2 不常用命令
