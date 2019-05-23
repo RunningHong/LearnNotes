@@ -128,37 +128,112 @@ TransactionDefinition 接口中定义了五个表示隔离级别的常量：
 
 **和编程式事务相比，声明式事务唯一不足地方是，后者的最细粒度只能作用到方法级别，无法做到像编程式事务那样可以作用到代码块级别**。
 
+### 3.2 编程式事务写法
 
+#### 3.2.1 配置
 
+核心配置文件applicationContext.xml里配置事务管理器*transactionManager*，并定义事务管理模板*transactionTemplate*，将事物管理器*transactionManager*注入到事物管理模板，方便将那些操作放在事务管理模板中。
 
+```xml
+<!-- 配置事物管理器 -->
+<bean id="transactionManager" 		 	     	class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	<property name="dataSource"ref="dataSource"/>
+</bean>
 
+<!-- 定义事物管理的模板：Spring为了简化事务管理的代码而提供的类 -->
+<bean id="transactionTemplate" 				class="org.springframework.transaction.support.TransactionTemplate">
+	<property name="transactionManager"ref="transactionManager"></property>
+</bean>  
+```
 
+#### 3.2.2 业务中使用方法
 
+在AccountService中注入TransactionTemplate事物模板（TransactionTemplate依赖DataSourceTransactionManager，DataSourceTransactionmanager依赖DataSource构造） 
 
+```java
 
+public class AccountServiceImpl implements AccountService {
+    //注入转账的Dao
+    private AccountDao accountDao; 
+    public void setAccountDao(AccountDao accountDao) {
+        this.accountDao = accountDao;
+    }
+ 
+    //注入事务管理模板
+    private TransactionTemplate transactionTemplate;   
+    public void setTransactionTemplate(TransactionTemplatetransactionTemplate) {
+        this.transactionTemplate = transactionTemplate;
+    }
+   
+    /**
+     * 编程式事务管理
+     * 将操作绑定在一起，如果遇到异常，则发生事务回滚
+     * final型变量，内部使用
+     * @param out
+     * @param in
+     * @param money
+     */
+    public void transfer(final String out,final String in,final Double money) {
+        //在事务模板中执行操作
+        transactionTemplate.execute(new TransactionCallbackWithoutResult(){
+        @Override
+        protected void doInTransactionWithoutResult(TransactionStatustransactionstatus){
+            accountDao.outMoney(out, money);
+            int i=1/0;
+            accountDao.inMoney(in, money);
+         }
+        });
+    }
+}
+```
 
+编程式事务管理需要手动改写代码，不便操作，在开发过程中不常用
 
+### 3.3 声明式事务写法
 
+#### 3.3.1 配置
 
+ 核心配置文件applicationContext.xml里注入事务管理器和开启注解事务实现注解驱动。
 
+```xml
+<!-- 1.配置事物管理器 -->
+    <bean id="transactionManager" 	class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource"ref="dataSource"></property>
+    </bean>
+    <!-- 2.开启注解事务 ,实现注解驱动-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+```
 
+#### 3.3.2 业务中使用方法
 
+```java
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * @Transactional注解中的属性
+ * propagation:事务的传播行为
+ * isolation:事务的隔离级别
+ * readOnly:只读
+ * rollbackFor:发生哪些异常事务回滚
+ * noRollbackFor:发生哪些异常事务不回滚
+ *
+ */
+@Transactional(propagation=Propagation.REQUIRED,isolation=Isolation.DEFAULT,readOnly=false)
+public class AccountServiceImpl implements AccountService {
+    //注入转账的Dao
+    private AccountDao accountDao; 
+    public void setAccountDao(AccountDao accountDao) {
+        this.accountDao = accountDao;
+    }  
+    /**
+     * @param out
+     * @param in
+     * @param money
+     */
+    public void transfer(String out,String in,Double money) {
+            accountDao.outMoney(out, money);
+            int i=1/0;
+            accountDao.inMoney(in, money);
+    }
+}
+```
 
