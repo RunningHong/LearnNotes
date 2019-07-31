@@ -40,7 +40,7 @@ echo $decode_result
 #!/bin/sh
 
 # 示例方法
-get_str() {
+function get_str() {
 	echo "string"
 }
 
@@ -80,11 +80,23 @@ nohup command > myout.file 2>&1 &
 在上面的例子中，输出被重定向到myout.file文件中。
 
 # 例子1：
-nohup myhive "sql" > myout.txt 2>&1 &
-运行hive的sql将结果存放到指定文件
+nohup sh bashName > myout.txt 2>&1 &
+运行sh将结果存放到指定文件
 ```
 
 备注：
 
 - 通过 `jobs` 命令可以查看任务
 - `fg %n` （n为数字）让后台运行的进程n到前台来，再可以通过ctrl+c终止任务
+- `bg %n` 让进程n到后台去【貌似不管用，可以使用 】
+-  `ctrl + z` 可以将一个正在前台执行的命令放到后台,**并且暂停**（再使用 `bg n`就可以开始暂停的任务 ）。
+
+## 5 转码文件
+
+```shell
+# 在windows上打开过的linux脚本，换行符会变化
+# 导致执行出现：$'\r': command not found
+
+dos2unix -k fileName
+```
+
