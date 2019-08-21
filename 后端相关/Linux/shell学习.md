@@ -114,3 +114,27 @@ nohup sh bashName > myout.txt 2>&1 &
 dos2unix -k fileName
 ```
 
+## 6 数字大小比较
+
+```shell
+示例脚本：
+
+#!/bin/bash
+if [ $1 -gt $2 ]
+	then echo "参数$1大于参数$2"
+else 
+	echo "参数$1小于参数$2"
+fi
+
+
+数字判断一些命令：
+# -gt 大于(>)
+# -ge 大于等于(>=)
+
+# -lt 小于(<)
+# -le 小于等于(<=)
+
+# -eq 等于(=)
+# -ne 不等于(!=)
+```
+
