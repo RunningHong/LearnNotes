@@ -231,7 +231,17 @@ SELECT day_table.* FROM day_table WHERE day_table.dt>= '2008-08-08';
 hive> show partitions day_hour_table; OK dt=2008-08-08/hour=08 dt=2008-08-08/hour=09 dt=2008-08-09/hour=09
 ```
 
+## 5 【Hive】毫秒时间戳格式化
 
+```sql
+-- 方法一
+select from_unixtime(cast(server_time/1000 as bigint), 'yyyy-MM-dd') date
+from access_log;
+
+-- 方法二
+select from_unixtime(cast(substring(server_time, 1, 10) as bigint),'yyyy-MM-dd HH') date
+from access_log;
+```
 
 
 
