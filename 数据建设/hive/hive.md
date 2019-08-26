@@ -241,7 +241,31 @@ from access_log;
 -- 方法二
 select from_unixtime(cast(substring(server_time, 1, 10) as bigint),'yyyy-MM-dd HH') date
 from access_log;
+
+-- 完整时分秒
+from_unixtime(cast(t2.oper_time/1000 as bigint), 'yyyy-MM-dd HH:mm:ss')
 ```
 
+## 6 hive中decode url
 
+```sql
+# 方法1
+# url为待decode的字段，这边是使用反射的方式，来进行解码
+select reflect('java.net.URLDecoder', 'decode',url, 'UTF-8')
+
+# 方法2
+# 手动的写解码,url为待decode的字段
+select
+    regexp_replace(
+        regexp_replace(
+            regexp_replace(
+                regexp_replace(
+                    regexp_replace(
+                        url, '\%7B', '{'
+                    ), '\%22', '"'
+                ), '\%3A', ':'
+            ), '\%2C', ','
+        ), '\%7D', '}'
+    )
+```
 
