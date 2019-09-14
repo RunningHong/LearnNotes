@@ -34,7 +34,7 @@ decode_result=$(urldecode "$url")
 echo $decode_result
 ```
 
-## 5 转码文件
+## 2 转码文件
 
 ```shell
 # 在windows上打开过的linux脚本，换行符会变化
@@ -43,9 +43,14 @@ echo $decode_result
 dos2unix -k fileName
 ```
 
-## 6 判断（数字、字符串、文件、逻辑）【[]、(())、[[]]的使用】
+## 3 Shell中source与sh和.的区别
 
-```shell
+使用sh和.运行程序，程序会在子程序中运行，这样的结果就是这里面的变量都相当于临时变量，运行后就失效了。
 
-```
+使用source运行程序，程勋会在主程序中运行，这样变量就相当于全局变量，运行后还可以在，服务器看到。
 
+![1568368130820](picture/1568368130820.png)
+
+## 4 shell中在脚本中第一行的#!/bin/bash的作用
+
+#!/bin/bash的作用在于告诉shell用哪个shell来运行脚本（因为shell不止一个）
