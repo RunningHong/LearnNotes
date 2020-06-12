@@ -71,3 +71,18 @@ for record in data:
     print("col1:{0}  col2:{1}   col3:{2}".format(col1, col2, col3))
 ```
 
+## 5 python2.7报错
+
+```
+UnicodeDecodeError: 'ascii' codec can't decode byte 0xe6 in position 0: ordinal not in range(128)
+
+原因：
+提示中的“ordinal not in range()”，意思是，字符不在128范围内，即说明不是普通的ASCII字符，超出处理能力了。
+所以感觉是str类型的变量，无法处理超过ASCII之外的字符。所以想到去将对应原始字符转换为unicode：
+
+解决：
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+```
+
