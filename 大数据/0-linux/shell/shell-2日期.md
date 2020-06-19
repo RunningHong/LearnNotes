@@ -28,3 +28,17 @@ date "+%Y-%m-%d %H:%M:%S"
     S显示当前秒钟，单位为秒。
 ```
 
+## 2 获取上个月的月份-小心坑
+
+```
+说明：不要直接使用 `date -d'1 month ago' +%Y-%m`，有些时候有bug
+如：cur_date=`date -d"2020-05-31 1 month ago" +"%Y-%m-%d"` 
+输出则为：2020-05-01
+
+
+正确方法：
+cur_month=`date -d"2020-05-31" +"%Y-%m-01"`
+last_month=`date -d"${cur_month} 1 month ago" +"%Y-%m-01"`
+输出：2020-04-01
+```
+
