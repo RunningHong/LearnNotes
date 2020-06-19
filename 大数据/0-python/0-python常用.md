@@ -86,3 +86,14 @@ reload(sys)
 sys.setdefaultencoding("utf-8")
 ```
 
+## 6 当前时间
+
+```
+import datetime
+cur_time_second = datetime.datetime.now()
+print("当前时间:", cur_time_second)
+
+
+当前时间: 2020-06-18 17:38:48.767390
+```
+
