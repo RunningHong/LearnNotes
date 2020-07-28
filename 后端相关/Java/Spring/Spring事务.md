@@ -177,7 +177,7 @@ public class AccountServiceImpl implements AccountService {
         //在事务模板中执行操作
         transactionTemplate.execute(new TransactionCallbackWithoutResult(){
         @Override
-        protected void doInTransactionWithoutResult(TransactionStatustransactionstatus){
+        protected void doInTransactionWithoutResult(TransactionStatus transactionstatus){
             accountDao.outMoney(out, money);
             int i=1/0;
             accountDao.inMoney(in, money);
