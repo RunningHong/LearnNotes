@@ -1,6 +1,8 @@
-# 手写mapreduce
+[toc]
 
-## 前提
+# 手写MapReudce
+
+## 1 前提
 
 ```
 现在拥有这样的数据需要对数据进行统计单词的个数
@@ -16,7 +18,7 @@ jay 1
 tom 1
 ```
 
-## 代码实现
+## 2 代码实现
 
 ```java
 import org.apache.commons.lang.StringUtils;
@@ -36,6 +38,21 @@ public class WordCount {
     public statis void main(string[] args) throws IOException, ClassNotFoundException, InterruptedException{
         // 1、获取配置信息
         Configuration configuration = new Configuration();
+        
+        // 输入和输出路径
+        String inputPath=args[0];
+        String outputPath=args[1];
+
+        System.out.println("args[0]  "+inputPath);
+        System.out.println("args[1]  "+outputPath);
+
+        // :首先删除输出路径的已有生成文件（如果输出路径存在则运行MR时会报错，所以这里手动删去）
+        FileSystem fs = FileSystem.get(new URI(inputPath), configuration);
+        Path outPath = new Path(outputPath);
+        if (fs.exists(outPath)) {
+            fs.delete(outPath, true);
+        }
+        
         
         // 2、Job得到实例（顺便设置jobname）
         Job job =  Job.getInstance(configuration, "wordCount");
@@ -57,9 +74,9 @@ public class WordCount {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
         
-        // 8.设置输入和输出路径
-        FileInputFormat.setInputPaths(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        // 8.设置输入和输出路径(如果输出路径存在则运行MR时会报错)
+        FileInputFormat.setInputPaths(job, new Path(inputPath));
+        FileOutputFormat.setOutputPath(job, new Path(outputPath));
         
         // 9.提交job&并且登台job计算完成
         job.waitForCompletion(true);
@@ -71,7 +88,8 @@ public class WordCount {
     // 后两个参数类型（Text，IntWritable）代表Map输出
     //     Text: 输出类型的key
     //     IntWritable: 输出类型的value
-    public static class WordCountMapper extends Mapper<longWritable, Text, Text, IntWritable> {
+    // 注意：如果是写的内部类的形式需要加static关键字
+    public static class WordCountMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
         
         // 参数1：LongWritable key代表行编译量-对应Mapper类的第一个参数类型
         // 参数2：Text value代表行数据-对应Mapper类的第二个参数类型
@@ -101,6 +119,7 @@ public class WordCount {
     
     // 前两个参数类型Text, IntWritable代表Map阶段输出的参数类型（即map最后context.write的参数类型）需要和main方法里的第5阶段类型(设置Map的输出类型)对应
     // 后两个参数类型Text, IntWritable代表Reduce阶段输出的参数类型（即reduce最后context.write的参数类型）需要和main方法里的第7阶段类型(设置最终的输出类型)对应
+    // 注意：如果是写的内部类的形式需要加static关键字
     public static class WordCountReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
         // 同一个key有且仅只执行一次reduce方法
         // 参数Text key代表进入reduce的key（对应一个单词）
