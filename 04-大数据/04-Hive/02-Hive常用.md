@@ -311,3 +311,33 @@ select distinct a.* from tripdata a order by rand(12345)
     select a.id from a left join b on a.id=b.id where b.id is not null
     
     解释：返回a表id在b表出现过的数据
+## 14 窗口函数last_value注意点
+
+    last_value: 取分组内排序后，截止到当前行，最后一个值(这里一定要注意是截止到当前行)，
+        如果使用了排序，其实last_value的值就是当前列的值
+    
+    demo sql：
+    SELECT
+        cookieid,
+        createtime,
+        url,
+        ROW_NUMBER() OVER(PARTITION BY cookieid ORDER BY createtime) AS rn,
+        LAST_VALUE(url) OVER(PARTITION BY cookieid ORDER BY createtime) AS last1,
+        FIRST_VALUE(url) OVER(PARTITION BY cookieid ORDER BY createtime DESC) AS last2
+    FROM lxw1234
+    ORDER BY cookieid,createtime;
+    
+    demo结果(注意last1和last2的区别)：
+    cookieid  createtime            url     rn     last1    last2
+    -------------------------------------------------------------
+    cookie1 2015-04-10 10:00:00     url1    1       url1    url7
+    cookie1 2015-04-10 10:00:02     url2    2       url2    url7
+    cookie1 2015-04-10 10:03:04     1url3   3       1url3   url7
+    cookie1 2015-04-10 10:10:00     url4    4       url4    url7
+    cookie1 2015-04-10 10:50:01     url5    5       url5    url7
+    cookie1 2015-04-10 10:50:05     url6    6       url6    url7
+    cookie1 2015-04-10 11:00:00     url7    7       url7    url7
+
+## 15 semi join原理
+
+ left semi join 是只传递表的join key给map 阶段 , 如果key 足够小还是执行map join, 如果不是则还是common join.
