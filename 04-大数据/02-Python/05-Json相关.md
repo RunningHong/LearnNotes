@@ -29,7 +29,7 @@ JSON注意事项：
 
 ## 3 常用方法
 
-### 3.1 json.dumps()-将 Python 对象编码成 JSON 字符串
+### 3.1 json.dumps()-对象转JSON 字符串
 
 ```python
 import json
@@ -39,9 +39,23 @@ print(json.dumps(data)) # 对象转json字符串
 
 # 输出（注： 在这里我们可以看到，原先的单引号已经变成双引号了）：
 {"age": 18, "name": "nanbei"}
+
+
+
+
+# 格式化：
+data = {'name':'nanbei','age':18}
+json_str=json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
+print(json_str)
+
+# 输出
+{
+    "age": 18,
+    "name": "nanbei"
+}
 ```
 
-### 3.2 json.loads()-将已编码的 JSON 字符串解码为 Python 对象
+### 3.2 json.loads()- JSON 字符串转对象
 
 ```python
 import json
