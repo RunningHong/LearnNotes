@@ -8,7 +8,7 @@
 
 在pom.xml中加入下面的：
 
-```
+```xml
     <build>
         <plugins>
             <plugin>
@@ -44,7 +44,7 @@
 
 在pom.xml中加入下面的：
 
-```
+```xml
     <build>
         <plugins>
             <plugin>
