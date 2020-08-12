@@ -19,13 +19,13 @@
 
 ## 2 distribute by
 
-作用：所有相同的key发送到同一个reduce中（想想hash算法）
+作用：相同的key发送到同一个reduce中（想想hash算法）
 
 ## 3 sort by
 
-sort by排序的行的排序操作发生在发送这些行到reduce之前。
+作用：ort by能保证局部有序（每个reducer出来的数据是有序的，但是不能保证所有的数据是有序的，除非只有一个reducer）
 
-作用：进入reduce前进行排序
+sort by 的数据在进入reduce前就完成排序。
 
 排序的次序依赖于排序列的类型，如果列是数值类型，那么排序按照数值排序，如果列式字符串类型，那么排序将按照字典排序。
 
@@ -34,4 +34,20 @@ sort by排序的行的排序操作发生在发送这些行到reduce之前。
 cluster by A 等同于 distribute by A sort by A
 
 除了具有 distribute by 的功能外还兼具 sort by 的功能。
+
+distribute by 和 sort by 合用就相当于cluster by，**但是cluster by 不能指定排序规则为asc或 desc** ，只能是**升序**排列。
+
+## distribute by和group by的区别
+
+都是按key值划分数据 都使用reduce操作唯一不同的是，
+
+distribute by只是单纯的分散数据，distribute by col – 按照col列把数据分散到不同的reduce。
+
+而group by把相同key的数据聚集到一起，后续必须是聚合操作。
+
+## order by和sort by的区别
+
+order by是全局排序 sort by只是确保每个reduce上面输出的数据有序。
+
+如果只有一个reduce时，和order by作用一样。
 
