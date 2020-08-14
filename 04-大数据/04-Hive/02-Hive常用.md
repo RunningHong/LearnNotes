@@ -6,8 +6,7 @@
 
 ### 1.1 创建表
 
-
-【例子1】普通创建表：
+#### 1.1.1 普通创建表：
 
 ```sql
 create table test_table(
@@ -20,7 +19,7 @@ STORED AS SEQUENCEFILE;
 
 ------
 
-【例子2】指定字段之间的分隔符，使用ascll的1来分隔
+#### 1.1.2 指定字段之间的分隔符，使用ascll的1来分隔
 
 ```sql
 create table page_view(
@@ -35,7 +34,8 @@ STORED AS SEQUENCEFILE;
 
 ------
 
-【例子3】分桶表
+#### 1.1.3 分桶表&分桶抽样
+
 对表的指定列进行分桶，是一个好的方法，它可以[有效地对数据集进行抽样查询]
 如果没有分桶，则会进行随机抽样，由于在查询的时候，需要扫描所有数据，因此，效率不高。
 例子通过一个userid的哈希函数，表被分成32个桶，在每个桶中数据是按照viewTime进行升序排序的，
@@ -67,7 +67,7 @@ table_sample: TABLESAMPLE (BUCKET x OUT OF y [ON colname])
 
 ------
 
-【例子4】复杂结构
+#### 1.1.4 复杂结构
 
 Array结构，Map结构，分桶
 
