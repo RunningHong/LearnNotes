@@ -55,6 +55,16 @@ ROW FORMAT DELIMITED
 STORED AS SEQUENCEFILE;
 ```
 
+分桶表的抽样：
+
+使用tablesample对分桶表进行抽样：
+
+```
+table_sample: TABLESAMPLE (BUCKET x OUT OF y [ON colname])  
+```
+
+详见：https://blog.csdn.net/leen0304/article/details/78961941
+
 ------
 
 【例子4】复杂结构
