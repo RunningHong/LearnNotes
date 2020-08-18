@@ -1,4 +1,4 @@
-[toc]
+[TOC]
 
 # hive数据倾斜
 
@@ -10,7 +10,7 @@
 
 
 
-
+https://www.cnblogs.com/qingyunzong/p/8847597.html
 
 
 
