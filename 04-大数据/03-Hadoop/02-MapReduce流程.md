@@ -2,17 +2,15 @@
 
 # MapReduce流程
 
+## 1 MR详细流程
 
+详情见：https://zhuanlan.zhihu.com/p/85666077
 
+![1597668966723](../picture/1597668966723.png)
 
+![1597669306762](../picture/1597669306762.png)
 
-
-
-
-
-
-
-## HadoopMapReduce 的 Shuffle 阶段
+## 2 HadoopMapReduce 的 Shuffle 阶段
 
 Hadoop MapReduce 的 Shuffle 阶段是指从 Map 的输出开始，包括系统执行排序，以及传送 Map 输出到 Reduce 作为输入的过程。
 排序阶段是指对 Map 端输出的 Key 进行排序的过程。不同的 Map 可能输出相同的 Key，相同的 Key 必须发送到同一个 Reduce 端处理。Shuffle 阶段可以分为 Map 端的 Shuffle 阶段和 Reduce 端的 Shuffle 阶段。Shuffle 阶段的工作过程，如图 2所示
