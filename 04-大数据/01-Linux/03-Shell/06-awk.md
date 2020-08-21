@@ -1,25 +1,4 @@
-[TOC]
-
-# 常用方法
-
-## 1 shell方法返回字符串
-
-```shell
-#!/bin/sh
-
-# 示例方法
-function get_str() {
-	echo "string"
-}
-
-#写法一
-echo `get_str` 
-
- #写法二
-echo $(get_str)
-```
-
-## 2 awk
+# awk
 
 awk是一个强大的文本分析工具，相对于grep的查找，sed的编辑，awk在其对数据分析并生成报告时，显得尤为强大。简单来说awk就是把文件逐行的读入，以空格为默认分隔符将每行切片，切开的部分再进行各种分析处理。
 
