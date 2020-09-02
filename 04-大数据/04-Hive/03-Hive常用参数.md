@@ -74,5 +74,7 @@ hive.udtf.auto.progress
 hive.exec.default.partition.name
 -- 数据仓库的位置，默认是/user/hive/warehouse；
 hive.metastroe.warehouse.dir
+-- 设置一行最大的读取长度（默认是Integer.maxvalue）-当压缩包里有非法数据（一条数据过长的时候）
+mapreduce.input.linerecordreader.line.maxlength
 ```
 
