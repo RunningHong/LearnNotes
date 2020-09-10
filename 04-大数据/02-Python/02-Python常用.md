@@ -22,21 +22,16 @@ output_str = res.read()   # 获得输出字符串
 print(output_str)
 ```
 
-## 3 python连接mysql
+## 3 引用指定路径的python文件
 
 ```python
-import pymysql
-db = pymysql.connect(host="xxxx", user="xxxx", password="xxxx", port=3306, database="xxx")
-cursor = db.cursor()
-cursor.execute("select col1, col2, col3 from table_name;")
-data = cursor.fetchall()
+# 如文件在/home/q/data/script/common/mysql_functions.py 需要引用改文件
+import sys;
+sys.path.append("/home/q/data/script/common")
+import mysql_functions
 
-# 遍历结果集
-for record in data:
-    col1=record[0]
-    col2=record[1]
-    col3=record[2]
-    print("col1:{0}  col2:{1}   col3:{2}".format(col1, col2, col3))
+# 使用时：
+mysql_functions.get_result_set_by_sql()
 ```
 
 ## 4 获取当前时间
@@ -106,5 +101,11 @@ locals -- 变量作用域，局部命名空间，如果被提供，可以是任�
 [1, 2, 3, 4, 5]
 ```
 
+## 6 join函数
 
+```python
+# list转字符串
+list=['aa', 'bb']
+list_str=','.join(list) # aa,bb
+```
 
