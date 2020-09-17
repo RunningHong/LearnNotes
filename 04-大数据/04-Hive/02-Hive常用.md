@@ -351,3 +351,17 @@ select distinct a.* from tripdata a order by rand(12345)
 ## 15 semi join原理
 
  left semi join 是只传递表的join key给map 阶段 , 如果key 足够小还是执行map join, 如果不是则还是common join.
+
+## 16 窗口函数-窗口大小
+
+    窗口大小为从起始行得到当前行：
+        partition by …order by…rows between unbounded preceding and current row
+    
+    窗口大小为从当前行到之前三行：
+        partition by …order by… rows between 3 preceding and current row
+    
+    窗口大小为当前行的前三行到之后的一行：
+        partition by …order by… rows between 3 preceding and 1 following
+    
+    窗口大小为当前行的前三行到之后的所有行：
+        partition by …order by… rows between 3 preceding and unbounded following
