@@ -365,3 +365,6 @@ select distinct a.* from tripdata a order by rand(12345)
     
     窗口大小为当前行的前三行到之后的所有行：
         partition by …order by… rows between 3 preceding and unbounded following
+
+## 17 xxx
+
