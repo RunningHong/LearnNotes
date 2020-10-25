@@ -304,3 +304,10 @@ Took 0.1934 seconds
 => 0
 ```
 
+### 3.10 将数据手动刷入hdfs-flush
+
+```
+hbase(main):113:0> flush 'test'
+Took 1.0470 seconds 
+```
+
