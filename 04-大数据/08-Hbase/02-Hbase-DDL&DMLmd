@@ -1,0 +1,306 @@
+[toc]
+
+# Hbase-DDL&DML
+
+## 1 一般操作
+
+### 1.1  **查询服务器状态** -status
+
+```
+hbase(main):008:0> status
+1 active master, 1 backup masters, 1 servers, 0 dead, 3.0000 average load
+Took 1.4970 seconds 
+```
+
+### 1.2  **查询版本号** -version
+
+```
+hbase(main):009:0> version
+2.2.4, r67779d1a325a4f78a468af3339e73bf075888bac, 2020年 03月 11日 星期三 12:57:39 CST
+Took 0.0179 seconds 
+```
+
+## 2 DDL操作
+
+### 2.1 创建表-create
+
+语法：`create '表名','列族1','列族2','列族n'`
+
+```
+-- 如创建表test_2并且有两个列族(mes和parent)
+hbase(main):014:0* create 'test_2','mes','parent'
+Created table test_2
+Took 4.5654 seconds                                                     
+=> Hbase::Table - test_2
+```
+
+### 2.2 列出表-list
+
+```
+hbase(main):015:0> list
+TABLE       
+test                   
+test_2                 
+2 row(s)
+Took 0.0593 seconds                
+=> ["test", "test_2"]
+```
+
+### 2.3 获取表的描述-desc
+
+```
+hbase(main):017:0> desc 'test_2'
+Table test_2 is ENABLED          
+test_2          
+COLUMN FAMILIES DESCRIPTION          
+{NAME => 'mes', VERSIONS => '1', EVICT_BLOCKS_ON_CLOSE => 'false', NEW_VERSION_BEHAVIOR => 'f
+alse', KEEP_DELETED_CELLS => 'FALSE', CACHE_DATA_ON_WRITE => 'false', DATA_BLOCK_ENCODING => 
+'NONE', TTL => 'FOREVER', MIN_VERSIONS => '0', REPLICATION_SCOPE => '0', BLOOMFILTER => 'ROW'
+, CACHE_INDEX_ON_WRITE => 'false', IN_MEMORY => 'false', CACHE_BLOOMS_ON_WRITE => 'false', PR
+EFETCH_BLOCKS_ON_OPEN => 'false', COMPRESSION => 'NONE', BLOCKCACHE => 'true', BLOCKSIZE => '
+65536'}                                                                                      
+{NAME => 'parent', VERSIONS => '1', EVICT_BLOCKS_ON_CLOSE => 'false', NEW_VERSION_BEHAVIOR =>
+ 'false', KEEP_DELETED_CELLS => 'FALSE', CACHE_DATA_ON_WRITE => 'false', DATA_BLOCK_ENCODING 
+=> 'NONE', TTL => 'FOREVER', MIN_VERSIONS => '0', REPLICATION_SCOPE => '0', BLOOMFILTER => 'R
+OW', CACHE_INDEX_ON_WRITE => 'false', IN_MEMORY => 'false', CACHE_BLOOMS_ON_WRITE => 'false',
+ PREFETCH_BLOCKS_ON_OPEN => 'false', COMPRESSION => 'NONE', BLOCKCACHE => 'true', BLOCKSIZE =
+> '65536'}                                                                                   
+2 row(s)
+
+QUOTAS                                                                                       
+0 row(s)
+Took 1.0133 seconds  
+```
+
+### 2.4 删除列族-alter
+
+语法：`alter '表名',{NAME=>'列族名称',METHOD=>'DELETE'}`
+
+```
+hbase(main):021:0> alter 'test_3',{NAME=>'cf_2',METHOD=>'delete'}
+Updating all regions with the new schema...
+1/1 regions updated.
+Done.
+Took 4.2621 seconds   
+```
+
+### 2.5 删除表-disable&drop
+
+首先把表设置为disable
+
+```
+hbase(main):028:0* disable 'test_3'
+Took 2.0198 seconds   
+```
+
+再删除表
+
+```
+hbase(main):029:0> drop 'test_3'
+Took 2.6044 seconds 
+```
+
+### 2.6 查看表是否存在-exists
+
+```
+hbase(main):033:0> exists 'test3'
+Table test3 does not exist  
+Took 0.0379 seconds 
+```
+
+### 2.7 查看表是否可用-is_enabled
+
+```
+hbase(main):036:0> is_enabled 'test'
+true         
+Took 0.0414 seconds         
+=> true
+```
+
+### 2.8 启用&禁用表-enable&disable
+
+```
+-- 启用
+hbase(main):043:0> enable 'test'
+Took 1.6706 seconds 
+
+-- 禁用
+hbase(main):040:0> disable 'test'
+Took 1.0685 seconds  
+```
+
+## 3 DML操作
+
+### 3.1 插入数据-put
+
+语法：put '表名','row_key','列族:列名','插入值'
+
+```
+-- 向test表中rowkey为222的cf列族的name列插入数据lisi
+hbase(main):048:0> put 'test','222','cf:name','lisi'
+Took 0.0346 seconds  
+
+-- 向test表中rowkey为222的cf列族的sex列插入数据male
+hbase(main):052:0> put 'test','222','cf:sex','male'
+Took 0.0843 seconds   
+```
+
+### 3.2 获取数据-get
+
+获取test表中rowkey=222的所有数据
+
+```
+hbase(main):054:0> get 'test','222'
+COLUMN                   CELL                        
+ cf:name                 timestamp=1603623560407, value=lisi         
+ cf:sex                  timestamp=1603623888598, value=male
+1 row(s)
+Took 0.0721 seconds
+```
+
+获取test表中rowkey=222&列族=cf的所有数据
+
+```
+hbase(main):056:0> get 'test','222','cf'
+COLUMN                   CELL             
+ cf:name                 timestamp=1603623560407, value=lisi 
+ cf:sex                  timestamp=1603623888598, value=male 
+1 row(s)
+Took 0.0461 seconds
+```
+
+获取test表中rowkey=222&列族=cf&列=name的值
+
+```
+hbase(main):055:0> get 'test','222','cf:name'
+COLUMN                   CELL                      
+ cf:name                 timestamp=1603623560407, value=lisi  
+1 row(s)
+Took 0.0616 seconds
+```
+
+### 3.3 更新数据-put
+
+相当于覆盖前面的数据
+
+```
+hbase(main):067:0> put 'test','222','cf:sex','female'
+Took 0.0251 seconds 
+```
+
+### 3.4 通过时间戳获取指定时间戳数据-get
+
+```
+hbase(main):075:0> get 'test','222',{COLUMN=>'cf:name',TIMESTAMP=>1603623560407}
+COLUMN                   CELL                       
+ cf:name                 timestamp=1603623560407, value=lisi         
+1 row(s)
+Took 0.0545 seconds 
+```
+
+### 3.5 全表扫描-scan
+
+```
+hbase(main):076:0> scan 'test'
+ROW                      COLUMN+CELL                  
+ 111                     column=cf:name, timestamp=1603621561067, value=xiaoming             
+ 222                     column=cf:name, timestamp=1603623560407, value=lisi                 
+ 222                     column=cf:sex, timestamp=1603624406921, value=female                
+2 row(s)
+Took 0.2027 seconds
+```
+
+### 3.6 删除指定列-delete
+
+```
+-- 查询信息
+hbase(main):078:0> get 'test','222'
+COLUMN                   CELL             
+ cf:name                 timestamp=1603623560407, value=lisi  
+ cf:sex                  timestamp=1603624406921, value=female
+1 row(s)
+
+-- 删除test表row_key=222&列=cf:sex数据
+hbase(main):079:0> delete 'test','222','cf:sex'
+Took 0.0503 seconds                                                                 
+-- 再次查看状态（female已被删除，编程male[上一个版本数据]）
+hbase(main):080:0> get 'test','222'
+COLUMN                   CELL             
+ cf:name                 timestamp=1603623560407, value=lisi
+ cf:sex                  timestamp=1603623888598, value=male
+1 row(s)
+Took 0.0424 seconds 
+```
+
+### 3.7 删除所有列-deleteall
+
+```
+-- 查看所有信息
+hbase(main):081:0> scan 'test'
+ROW                      COLUMN+CELL    
+ 111                     column=cf:name, timestamp=1603621561067, value=xiaoming             
+ 222                     column=cf:name, timestamp=1603623560407, value=lisi                 
+ 222                     column=cf:sex, timestamp=1603623888598, value=male                  
+2 row(s)
+Took 0.0620 seconds                                                                 
+-- 删除row_key=111的所有列信息
+hbase(main):082:0> deleteall 'test','111'
+Took 0.0132 seconds                                                                   
+-- 再次查看
+hbase(main):083:0> scan 'test'
+ROW                      COLUMN+CELL              
+ 222                     column=cf:name, timestamp=1603623560407, value=lisi                 
+ 222                     column=cf:sex, timestamp=1603623888598, value=male                  
+1 row(s)
+Took 0.0454 seconds   
+```
+
+### 3.8 统计表中的行数-count
+
+count是对row_key进行计数
+
+```
+-- 查看表的行数
+hbase(main):085:0> count 'test'
+1 row(s)
+Took 0.5439 seconds       
+=> 1
+
+
+-- 全表扫描
+hbase(main):086:0> scan 'test'
+ROW                      COLUMN+CELL                  
+ 222                     column=cf:name, timestamp=1603623560407, value=lisi                 
+ 222                     column=cf:sex, timestamp=1603623888598, value=male                  
+1 row(s)
+Took 0.0142 seconds 
+```
+
+### 3.9 清空整张表-truncate
+
+```
+-- 全表扫描test3表的所有信息
+hbase(main):110:0* scan 'test3'
+ROW                      COLUMN+CELL                     
+ 1                       column=cf:age, timestamp=1603625446987, value=12                    
+ 1                       column=cf:name, timestamp=1603625443158, value=tom                  
+ 1                       column=cf:sex, timestamp=1603625449877, value=male                  
+ 2                       column=cf:age, timestamp=1603625534108, value=22                    
+ 2                       column=cf:name, timestamp=1603625530126, value=jarry                
+ 2                       column=cf:sex, timestamp=1603625471305, value=male                  
+2 row(s)
+Took 0.0369 seconds                                                             
+
+-- 清空表test3
+hbase(main):111:0> truncate 'test3'
+Truncating 'test3' table (it may take a while):
+Disabling table...
+Truncating table...
+Took 4.8912 seconds                                                               
+-- 计算test3中row_key的个数
+hbase(main):112:0> count 'test3'
+0 row(s)
+Took 0.1934 seconds                 
+=> 0
+```
+
