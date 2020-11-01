@@ -4,7 +4,7 @@
 
 ## 1 一般操作
 
-### 1.1  **查询服务器状态** -status
+### 1.1  查询服务器状态 -status
 
 ```
 hbase(main):008:0> status
@@ -12,7 +12,7 @@ hbase(main):008:0> status
 Took 1.4970 seconds 
 ```
 
-### 1.2  **查询版本号** -version
+### 1.2  查询版本号 -version
 
 ```
 hbase(main):009:0> version

@@ -2,7 +2,7 @@
 
 # Hbase常用Java API
 
- http://c.biancheng.net/view/3599.html 
+## 1 代码实现
 
 ```java
 package com.hong.hbase;
@@ -212,3 +212,6 @@ public class HBaseDemo {
 
 ```
 
+## 2 相关资料
+
+[HBase相关api]( http://c.biancheng.net/view/3599.html )
