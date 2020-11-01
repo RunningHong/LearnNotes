@@ -58,3 +58,4 @@ Hfile生成方式：
 [HBase架构](https://www.jianshu.com/p/5aceaa02303b)
 
 [视屏-尚硅谷HBase教程-详细架构](https://www.bilibili.com/video/BV1Y4411B7jy?t=368&p=14)
+
