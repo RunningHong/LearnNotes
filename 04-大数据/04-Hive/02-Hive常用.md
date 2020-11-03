@@ -121,8 +121,15 @@ alter table old_table_name rename to new_table_name;
 -- 对表的列名进行重命名
 alter table old_table_name replace column (col1 type, ...);
 
+-- hive增加、修改、删除字段: https://zhuanlan.zhihu.com/p/222036469
 -- 增加列
 alter table table_name add columns(c1 STRING, c2 INT, ...);
+-- 在hive1.2.1及更小版本会有一个bug,新增了列但查出的值为NULL
+-- alter table xxxx add columns(c3 string);  查分区数据新增字段值为空，
+-- 需再执行alter table xxxx partition(step='1') add columns(c3 string);【假设当前只有step='1'的分区】
+-- 如：
+-- alter table xx ADD COLUMNS (isordentr STRING COMMENT '是否生单入口；1:生单/0：非生单')
+-- alter table xx partition(dt) add columns(isordentr string)
 
 -- hive修改表名备注
 ALTER TABLE 数据库名.表名 SET TBLPROPERTIES('comment' = '新的表备注');
