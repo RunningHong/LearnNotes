@@ -55,7 +55,15 @@ HBase采用表来组织数据，表由许多行和列组成，列划分为多个
 默认情况下，每一个单元中的数据插入时都会用时间戳来进行版本标识。
 读取单元数据时，如果时间戳没有被指定，则默认返回最新的数据；写入新的单元数据时，如果没有设置时间戳，则默认使用当前时间。每一个列族的单元数据的版本数量都被 HBase 单独维护，默认情况下，HBase 保留 3 个版本数据。
 
-## 3 Phoenix
+## 3 逻辑结构
+
+![image-20201105093805154](../picture/image-20201105093805154.png)
+
+## 4 物理结构
+
+![image-20201105093849970](../picture/image-20201105093849970.png)
+
+## 4 Phoenix
 
 [介绍&使用](https://github.com/heibaiying/BigData-Notes/blob/master/notes/Hbase%E7%9A%84SQL%E4%B8%AD%E9%97%B4%E5%B1%82_Phoenix.md)
 
