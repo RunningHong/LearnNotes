@@ -33,7 +33,7 @@
 5. 将从StoreFile文件中查询到的数据块（Block，HFile数据存储单元，默认大小为64KB）缓存到BlockCache。
 6. 将合并后的最终结果返回给客户端。
 
-## 相关资料
+## ps-相关资料
 
 [HBase读写流程](https://github.com/heibaiying/BigData-Notes/blob/master/notes/Hbase%E7%9A%84SQL%E4%B8%AD%E9%97%B4%E5%B1%82_Phoenix.md)
 

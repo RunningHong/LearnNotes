@@ -53,7 +53,7 @@ Hfile生成方式：
 
 ![1604202236754](picture/1604202236754.png)
 
-## 相关引用
+## ps-相关引用
 
 [HBase架构](https://www.jianshu.com/p/5aceaa02303b)
 
