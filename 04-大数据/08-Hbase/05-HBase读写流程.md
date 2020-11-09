@@ -33,6 +33,17 @@
 5. 将从StoreFile文件中查询到的数据块（Block，HFile数据存储单元，默认大小为64KB）缓存到BlockCache。
 6. 将合并后的最终结果返回给客户端。
 
+```
+注意：
+这里并不是先读内存，如果内存没有该数据再读磁盘，而是同时查询内存（BlockCache，MemStore）以及磁盘（StoreFile）。这样做的原因是当相同的rowkey在StoreFile文件内的数据时间戳大于MemStore中的时间戳时，如果先读MemStore的话会给客户端返回一个旧的数据，因此需要同时读内存和磁盘里的数据，然后根据rowkey为主键，以timestamp为版本进行数据合并；
+
+同时，在读磁盘的时候会将磁盘中的HFile缓存到BlockCache内，这样的话在下一次访问该HFile时就可以先到BlockCache中拿了，如果BlockCache内没有该文件，再去StoreFile中取。这里不必担心万一缓存到BlockCache之后又修改了该rowkey的数据会不会与BlockCache内的数据不一致，因为当数据被修改之后再次读取时：
+    如果在此期间没有触发flush，该数据会在MemStore内，下次读取数据时会将BlockCache和MemStore中的该rowkey的数据进行合并；
+    如果在此期间触发了flush，新的数据会在StoreFile中另一个新的HFile内，此时客户端再次请求读该RowKey的数据时会同时访问BlockCache内的包含旧版本数据的HFile以及StoreFile中的新HFile进行数据合并，然后会再将新的HFile缓存至BlockCache；
+    
+也即是说每次读HBase时，如果该数据不在内存中，都会产生一次磁盘IO，而写数据是直接追加写WAL和内存，因此HBase是写比读更快。
+```
+
 ## ps-相关资料
 
 [HBase读写流程](https://github.com/heibaiying/BigData-Notes/blob/master/notes/Hbase%E7%9A%84SQL%E4%B8%AD%E9%97%B4%E5%B1%82_Phoenix.md)

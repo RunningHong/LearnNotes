@@ -212,6 +212,6 @@ public class HBaseDemo {
 
 ```
 
-## 2 相关资料
+## ps-相关资料
 
 [HBase相关api]( http://c.biancheng.net/view/3599.html )
