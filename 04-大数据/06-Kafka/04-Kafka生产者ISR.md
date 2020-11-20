@@ -39,6 +39,31 @@ Kafka 选择了第二种方案，原因如下：
 - -1（all） ： producer 等待 broker 的 ack， partition 的 leader 和 ISR 的follower 全部落盘成功后才返回 ack。但是如果在 follower 同步完成后， broker 发送 ack 之前， leader 发生故障，那么会造成**数据重复**。
     <img src="picture/image-20201118132936913.png" alt="image-20201118132936913" style="zoom:80%;" />
 
+## 5 数据一致性问题
+
+<img src="picture/image-20201119123336503.png" alt="image-20201119123336503" style="zoom:80%;" />
+
+- LEO：（Log End Offset）每个副本的最后一个offset
+- HW：（High Watermark）高水位，指的是消费者能见到的最大的 offset， **ISR 队列**中最小的 LEO
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## ps-相关资料
 
 [Kafka学习笔记](https://my.oschina.net/jallenkwong/blog/4449224)
