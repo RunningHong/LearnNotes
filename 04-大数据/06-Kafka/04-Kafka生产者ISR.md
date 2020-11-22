@@ -41,26 +41,25 @@ Kafka 选择了第二种方案，原因如下：
 
 ## 5 数据一致性问题
 
+ **数据一致性主要是说不论是老的 Leader 还是新选举的 Leader，Consumer 都能读到一样的数据。** 
+
 <img src="picture/image-20201119123336503.png" alt="image-20201119123336503" style="zoom:80%;" />
 
 - LEO：（Log End Offset）每个副本的最后一个offset
 - HW：（High Watermark）高水位，指的是消费者能见到的最大的 offset， **ISR 队列**中最小的 LEO
 
+假设分区的副本为3，其中副本0是 Leader，副本1和副本2是 follower，并且在 ISR 列表里面。虽然副本0已经写入了 Message19，但是 Consumer 只能读取到 Message12。因为所有的 ISR 都同步了 Message12，只有 High Water Mark 以上的消息才支持 Consumer 读取，而 High Water Mark 取决于 ISR 列表里面偏移量最小的分区，对应于上图的副本2，**这个很类似于木桶原理**。
 
+这样做的原因是还没有被足够多副本复制的消息被认为是“不安全”的，如果 Leader 发生崩溃，另一个副本成为新 Leader，那么这些消息很可能丢失了。如果我们允许消费者读取这些消息，可能就会破坏一致性。试想，一个消费者从当前 Leader（副本0） 读取并处理了 Message14，这个时候 Leader 挂掉了，选举了副本1为新的 Leader，这时候另一个消费者再去从新的 Leader 读取消息，发现这个消息其实并不存在，这就导致了数据不一致性问题。
 
+当然，引入了 High Water Mark 机制，会导致 Broker 间的消息复制因为某些原因变慢，那么消息到达消费者的时间也会随之变长（因为我们会先等待消息复制完毕）。延迟时间可以通过参数 replica.lag.time.max.ms 参数配置，它指定了副本在复制消息时可被允许的最大延迟时间。
 
+## 6 follower 故障和 leader 故障
 
+- **follower 故障**：follower 发生故障后会被临时踢出 ISR，待该 follower 恢复后， follower 会读取本地磁盘记录的上次的 HW，并将 log 文件高于 HW 的部分截取掉，从 HW 开始向 leader 进行同步。等该 follower 的 LEO 大于等于该 Partition 的 HW，即 follower 追上 leader 之后，就可以重新加入 ISR 了。
+- **leader 故障**：leader 发生故障之后，会从 ISR 中选出一个新的 leader，之后，为保证多个副本之间的数据一致性， 其余的 follower 会先将各自的 log 文件高于 HW 的部分截掉，然后从新的 leader同步数据。
 
-
-
-
-
-
-
-
-
-
-
+注意： 这只能保证副本之间的数据一致性（ISR保证数据一致性），并不能保证数据不丢失或者不重复（ACK=-1保证数据不丢失，幂等性保证数据不重复）。
 
 
 
