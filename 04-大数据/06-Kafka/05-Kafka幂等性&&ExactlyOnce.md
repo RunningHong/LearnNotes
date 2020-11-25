@@ -1,6 +1,6 @@
 [toc]
 
-# Kafka幂等性-ExactlyOnce
+# Kafka幂等性&&ExactlyOnce
 
 ## 1 ExactlyOnce
 
