@@ -54,7 +54,7 @@ bin/kafka-console-producer.sh --broker-list node01:9092 --topic first
 ```shell
 # 启动控制台消费者（阻塞进程）从kafka机器node01:9092中的first主题消费消息
 # --from-beginning代表从最头开始消费（offset=0），如果没有就从启动时开始消费(这个topic的最新的offset)
-bin/kafka-console-cosumer.sh --bootstrap-server node01:9092 --topic first --from-beginning
+bin/kafka-console-consumer.sh --bootstrap-server node01:9092 --topic first --from-beginning
 
 hello
 world
