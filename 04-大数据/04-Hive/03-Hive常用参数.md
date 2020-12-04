@@ -42,6 +42,7 @@ set mapred.min.split.size.per.rack=268435456;
 
 
 -- 根据输入文件的大小决定是否将普通join转换为mapjoin的一种优化，默认不开启false；
+-- 注意：如果为left join 需要大表关联小表--hive没优化顺序， 反之right join需要小表关联大表，官网解释full join需要流化两张表所以不支持mapjoin
 set hive.auto.convert.join=true;
 -- 表文件的大小作为开启和关闭MapJoin的阈值(默认25000000即25M)
 set hive.mapjoin.smalltable.filesize=25000000;
