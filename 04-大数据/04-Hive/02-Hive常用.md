@@ -373,5 +373,36 @@ select distinct a.* from tripdata a order by rand(12345)
     窗口大小为当前行的前三行到之后的所有行：
         partition by …order by… rows between 3 preceding and unbounded following
 
-## 17 xxx
+## 17 shell以及hiveCLI中的\总结
+
+```
+    1、在hiveCLI中
+        hiveCLI会对\进行一步解析，如: \\会被解析为\， 同理\\\\会被解析为\\
+            在hiveCLI如果我们需要对字符串中\进行替换,就需要写成： select regexp_replace('aa\bb', '\\\\', ''); -> ab
+            原因：提交时\\\\会被解析为\\, 最后到udf中运行就变成了： regexp_replace('aa\bb', '\\', ''); 这才符合我们写的java代码
+
+    2、在shell中
+        shell会对\进行一步解析（针对被""包含的字符串，被''包含的字符串不会被解析），\\会被解析为\， 同理\\\\会被解析为\\
+            echo "aa\bb"     -> aa\bb
+            echo "aa\\bb"    -> aa\bb
+            echo "aa\\\bb"   -> aa\\bb
+            echo "aa\\\\bb"  -> aa\\bb
+            echo "aa\"bb"    -> aa"bb （因为被"包裹，所以\"被解析为"）
+            echo "aa\\"bb"   -> 格式错误 （因为被"包裹，\\被解析为\,字符串中第一个"[\后面的"]被解析为首个"的结束,
+                                    再追加了字符串bb最后的"[bb后面的"]没有与之匹配的结束", 所以格式错误）
+            echo "aa\\\"bb"  -> aa\"bb
+
+
+    总结：所以如果我们在shell中写sql想把字段中的\替换掉那么我们需要按下面格式写:
+        hql=" select  regexp_replace('aa\bb', '\\\\\\\\', ''); " 运行后才得到-> aabb
+        原因：
+            1、udf真正执行的时候需要的是: regexp_replace('aa\bb', '\\', '')
+            2、hiveCLI会解析一次，所以我们需要反解析: regexp_replace('aa\bb', '\\\\', '')
+            3、shell也会解析一次，所以我们需要再次反解析: regexp_replace('aa\bb', '\\\\\\\\', '')
+
+    速记: 先看java代码中到底需要几个\，如果在hiveCLI中运行就需要\个数X2，
+        如果需要在shell中写sql再提交到hiveCLI就需要在前面的基础上\个数还要X2
+```
+
+## 18 xxx
 
