@@ -404,5 +404,14 @@ select distinct a.* from tripdata a order by rand(12345)
         如果需要在shell中写sql再提交到hiveCLI就需要在前面的基础上\个数还要X2
 ```
 
-## 18 xxx
+## 18 hive中定义变量
 
+```sql
+-- 通过set来定义变量
+set def_name='hello world';
+
+-- 通过${hiveconf:变量名}来取变量值
+select ${hiveconf:def_name};  -> hello world
+```
+
+## 19 xxx
