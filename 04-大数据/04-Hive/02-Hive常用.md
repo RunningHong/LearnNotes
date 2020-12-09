@@ -414,4 +414,25 @@ set def_name='hello world';
 select ${hiveconf:def_name};  -> hello world
 ```
 
-## 19 xxx
+## 19 时间区段的提取--extract
+
+```sql
+-- 语法：从hive2.2.0开始引入
+-- field可以是day、hour、minute, month, quarter，dayofweek等等
+-- source可以是date、timestamp类型
+extract(field FROM source)
+```
+
+```sql
+SELECT extract(year FROM '2020-08-05 09:30:08');   -- 结果为 2020
+SELECT extract(quarter FROM '2020-08-05 09:30:08');   -- 结果为 3
+SELECT extract(month FROM '2020-08-05 09:30:08');   -- 结果为 8
+SELECT extract(week FROM '2020-08-05 09:30:08');   -- 结果为 32,一年中的第几周
+SELECT extract(dayofweek FROM '2020-08-05 09:30:08');   -- 结果为 4
+SELECT extract(day FROM '2020-08-05 09:30:08');  -- 结果为 5
+SELECT extract(hour FROM '2020-08-05 09:30:08');   -- 结果为 9
+SELECT extract(minute FROM '2020-08-05 09:30:08');   -- 结果为 30
+SELECT extract(second FROM '2020-08-05 09:30:08');   -- 结果为 8
+```
+
+## 20 xx
