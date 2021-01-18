@@ -186,7 +186,7 @@ MapReduce 的 combiner 组件参数包括：
 >
 > **set hive.groupby.mapaggr.checkinterval = 100000 在 Map 端进行聚合操作的条目数目**
 
-9.2 使用 Group By 有数据倾斜的时候进行负载均衡
+### 9.2 使用 Group By 有数据倾斜的时候进行负载均衡
 
 >  **set hive.groupby.skewindata = true**
 
