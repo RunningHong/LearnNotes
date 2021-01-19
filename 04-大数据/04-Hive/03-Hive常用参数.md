@@ -1,22 +1,62 @@
+[toc]
+
 # hive常用参数
+
+## 1 基础参数
 
 ```sql
 -- 设置job名称
 set mapred.job.name=pp_xxx_hongzh_zhang;
 
+-- 查看集群设置的文件块大小
+-- 根据版本而定，新版的默认是256M
+set dfs.block.size; 
+
+-- 数据仓库的位置，默认是/user/hive/warehouse；
+set hive.metastroe.warehouse.dir;
+```
+
+## 2 动态分区相关
+
+```sql
 -- 动态分区相关
 set hive.exec.dynamic.partition.mode=nonstrict;
 set hive.exec.dynamic.partition=true;
 set hive.exec.max.dynamic.partitions=100000;
 set hive.exec.max.dynamic.partitions.pernode=100000;
+```
 
--- mapreduce内存相关
+## 3 MR内存相关
+
+```sql
+-- map内存相关
 set mapreduce.map.memory.mb=8192;
 set mapreduce.map.java.opts=-Xmx5734M;
+
+-- reduce内存相关
 set mapreduce.reduce.memory.mb=8192;
 set mapreduce.reduce.java.opts=-Xmx5734M;
+```
+
+## 4 切片大小/map个数
+
+通常情况下，作业会通过input的目录产生一个或者多个map任务。 
+主要的决定因素有：
+
+- input的文件总个数
+- input的文件大小
+- 文件是否可split(如gz文件不可以切分)
+- 集群设置的文件块大小（set dfs.block.size;查看）
+
+举例： （前提：默认集群文件块大小为128M）
+
+1. 假设input目录下有1个文件(大小为780M)，那么hadoop会将该文件分隔成7个块（6个128M的块和1个12M的块），从而产生7个map数。
+2. 假设input目录下有3个文件a,b,c,大小分别为10m，20m，130m，那么hadoop会分隔成4个块（10m,20m,128m,2m）,从而产生4个map数，即如果文件大于块大小(128m),那么会拆分，如果小于块大小，则把该文件当成一个块。
+3. 假设有一个大小为300M的gz文件，由于gz不可切分
 
 
+
+```sql
 -- 启动map最大的切片大小设置为256M
 set mapreduce.input.fileinputformat.split.maxsize=268435456;
 -- 一个节点上启动map最小的切片大小设置为32M
@@ -25,11 +65,11 @@ set mapreduce.input.fileinputformat.split.minsize.per.node=33554432;
 set mapreduce.input.fileinputformat.split.minsize.per.rack=33554432;
 
 
-
 -- 手动控制mapper的个数-需要开启压缩
 set mapreduce.map.output.compress=true;
 set mapreduce.map.output.compress.codec=org.apache.hadoop.io.compress.SnappyCodec;
 set hive.exec.compress.intermediate=true;
+
 
 -- 执行前进行小文件合并
 set hive.input.format=org.apache.hadoop.hive.ql.io.CombineHiveInputFormat;
@@ -39,6 +79,24 @@ set mapred.max.split.size=268435456;
 set mapred.min.split.size.per.node=52428800;
 -- 一个交换机下split的至少的大小(这个值决定了多个交换机上的文件是否需要合并)
 set mapred.min.split.size.per.rack=268435456;
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```sql
 
 
 -- 根据输入文件的大小决定是否将普通join转换为mapjoin的一种优化，默认不开启false；
@@ -56,11 +114,11 @@ set hive.exec.parallel=false;
 set hive.map.aggr=true；
 
 
--- 设置reduce处理的大小为256M,会根据这个来计算reduce个数
+-- 设置reduce处理的大小为512M,会根据这个来计算reduce个数
 set hive.exec.reducers.bytes.per.reducer=268435456;
 
 -- group by操作是否支持倾斜数据负载均衡。思想:先打散再聚合
--- 注意：只能对单个字段聚合。
+-- ！！！注意：只能对单个字段聚合（当启用时如果要在查询语句中对多个字段进行去重统计时会报错）。
 -- 控制生成两个MR Job,第一个MR Job Map的输出结果随机分配到reduce中减少某些key值条数过多某些key条数过小造成的数据倾斜问题。
 -- 在第一个 MapReduce 中，map 的输出结果集合会随机分布到 reduce 中，每个reduce 做部分聚合操作，并输出结果。
 -- 这样处理的结果是，相同的 Group By Key 有可能分发到不同的reduce中，从而达到负载均衡的目的；
@@ -68,7 +126,7 @@ set hive.exec.reducers.bytes.per.reducer=268435456;
 set hive.groupby.skewindata=true；
 
 -- 判断数据倾斜的阈值，如果在join中发现同样的key超过该值则认为是该key是倾斜的join key，默认是100000；
-hive.skewjoin.key
+set hive.skewjoin.key=100000;
 
 -- hive操作执行时的模式，默认是nonstrict非严格模式，如果是strict模式，很多有风险的查询会被禁止运行，比如笛卡尔积的join和动态分区；
 hive.mapred.mode
@@ -86,8 +144,7 @@ hive.udtf.auto.progress
 -- 当动态分区启用时，如果数据列里包含null或者空字符串的话，数据会被插入到这个分区，默认名字是HIVE_DEFAULT_PARTITION；
 hive.exec.default.partition.name
 
--- 数据仓库的位置，默认是/user/hive/warehouse；
-hive.metastroe.warehouse.dir
+
 
 -- 设置一行最大的读取长度（默认是Integer.maxvalue）-当压缩包里有非法数据（一条数据过长的时候）
 -- 超长行会导致内存溢出, 设置该参数可以确保 recordreader 跳过超长行
