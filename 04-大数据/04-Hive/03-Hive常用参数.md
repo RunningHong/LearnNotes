@@ -138,8 +138,6 @@ set hive.exec.reducers.bytes.per.reducer=268435456;
 set mapred.reduce.tasks=15;
 ```
 
-
-
 ## 6 map输出压缩&reduce输出时合并小文件
 
 ```sql
