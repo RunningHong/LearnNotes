@@ -24,6 +24,10 @@ set hive.exec.dynamic.partition.mode=nonstrict;
 set hive.exec.dynamic.partition=true;
 set hive.exec.max.dynamic.partitions=100000;
 set hive.exec.max.dynamic.partitions.pernode=100000;
+
+
+-- 当动态分区启用时，如果数据列里包含null或者空字符串的话，数据会被插入到这个分区，默认名字是__HIVE_DEFAULT_PARTITION__
+set hive.exec.default.partition.name=__HIVE_DEFAULT_PARTITION__;
 ```
 
 ## 3 MR内存相关
@@ -102,7 +106,7 @@ set mapreduce.input.fileinputformat.split.minsize.per.rack=33554432;
 
 
 
--- 其他不常用参数
+-- 其他不常用参数，一般不改动
 -- 每个nodemanager节点上可运行的最大map任务数，默认值2，可根据实际值调整为10~100；
 set mapreduce.tasktracker.map.tasks.maximum=30; 
 -- 每个nodemanager节点上可运行的最大reduce任务数，默认值2，可根据实际值调整为10~100；
@@ -135,6 +139,7 @@ reduce个数并不是越多越好，同map一样，启动和初始化reduce也�
 set hive.exec.reducers.bytes.per.reducer=268435456;
 
 -- 方式2：直接指定reduce个数
+-- 一般不用，如果集群资源不足，造成程序运行出现OOM(内存溢出不足)，可以根据推定的reduce个数手动增加数量
 set mapred.reduce.tasks=15;
 ```
 
@@ -158,29 +163,29 @@ set hive.merge.size.per.task=128000000;
 set hive.merge.smallfiles.avgsize=128000000;   
 ```
 
+## 7 map join优化
 
-
-
-
-
-
-
-
-
+map join原理见./07-Join原理 中的的第二节
 
 ```sql
-
-
-
-
 -- 根据输入文件的大小决定是否将普通join转换为mapjoin的一种优化，默认不开启false；
 -- 注意：如果为left join 需要大表关联小表--hive没优化顺序， 反之right join需要小表关联大表，官网解释full join需要流化两张表所以不支持mapjoin
 set hive.auto.convert.join=true;
 -- 表文件的大小作为开启和关闭MapJoin的阈值(默认25000000约25M)
 set hive.mapjoin.smalltable.filesize=25000000;
+```
 
 
+
+
+
+
+
+## 99 其他参数
+
+```sql
 set mapreduce.reduce.input.buffer.percent=1;
+
 -- 禁止并行执行
 set hive.exec.parallel=false;
 
@@ -204,18 +209,13 @@ set hive.skewjoin.key=100000;
 -- hive操作执行时的模式，默认是nonstrict非严格模式，如果是strict模式，很多有风险的查询会被禁止运行，比如笛卡尔积的join和动态分区；
 hive.mapred.mode
 
--- 直接指定reduce大小为8
-mapreduce.job.reduces=8
--- 设置reduce的个数，一般不用，如果集群资源不足，造成程序运行出现OOM(内存溢出不足)，可以根据推定的reduce个数手动增加数量
-mapred.reduce.tasks = 15
 
 
 
 -- UDTF执行时hive是否发送进度信息到TaskTracker，默认是false；
 hive.udtf.auto.progress
 
--- 当动态分区启用时，如果数据列里包含null或者空字符串的话，数据会被插入到这个分区，默认名字是__HIVE_DEFAULT_PARTITION__
-set hive.exec.default.partition.name=__HIVE_DEFAULT_PARTITION__;
+
 
 
 

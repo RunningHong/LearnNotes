@@ -35,6 +35,12 @@ ON (a.id = b.id);
 
 ## 2 Hive Map Join
 
+示例场景：
+select f.a,f.b from A t join B f on ( f.a=t.a and f.ftime=20110802) 
+该语句中B表有30亿行记录，A表只有100行记录，而且B表中数据倾斜特别严重，有一个key上有15亿行记录，在运行过程中特别的慢，而且在reduece的过程中遇有内存不够而报错。
+
+为解决上面的问题，优化sql需要使用map join, **省去了reduce运行的效率也会高很多**
+
 MapJoin通常用于一个很小的表和一个大表进行join的场景(实测有些场景会很快！！！)，
 
 具体小表有多小，由参数**hive.mapjoin.smalltable.filesize**来决定，该参数表示小表的总大小，默认值为25000000字节，即25M。
@@ -56,6 +62,12 @@ Hive0.7之前，需要使用hint提示 /*+ mapjoin(table) */才会执行MapJoin,
 
 - 接下来是Task B，该任务是一个没有Reduce的MR，启动MapTasks扫描大表a,在Map阶段，根据a的每一条记录去和DistributeCache中b表对应的HashTable关联，并直接输出结果。
 - 由于MapJoin没有Reduce，所以由Map直接输出结果文件，有多少个Map Task，就有多少个结果文件。
+
+注意点：
+
+1. full join无法使用map join，官网解释是无法把两张表都流化（详见hive官网）
+    ![image-20210122102132153](picture/image-20210122102132153.png)
+2. 对于left join小表要放在后面，对于right join小表要放到前面，这样才能识别哪个表需要被流化
 
 ## ps-相关资料
 
