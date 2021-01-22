@@ -14,6 +14,11 @@ set dfs.block.size;
 
 -- 数据仓库的位置，默认是/user/hive/warehouse；
 set hive.metastroe.warehouse.dir;
+
+-- hive操作执行时的模式，默认是nonstrict非严格模式，
+-- 如果是strict模式，很多有风险的查询会被禁止运行，比如笛卡尔积的join和动态分区；
+set hive.mapred.mode=nonstrict;
+
 ```
 
 ## 2 动态分区相关
@@ -113,16 +118,26 @@ set mapreduce.tasktracker.map.tasks.maximum=30;
 set mapreduce.tasktracker.reduce.tasks.maximum=30; 
 
 
--- 以下是旧版本的参数，已弃用（建议用前面新版本的参数值）
+-- 以下是旧版本的参数，已弃用！！（建议用前面新版本的参数值）
 -- 设置map切片大小最大为256M
-set mapred.max.split.size=268435456;
+-- set mapred.max.split.size=268435456;
 -- 一个节点上切片大小至少为50M
-set mapred.min.split.size.per.node=52428800;
+-- set mapred.min.split.size.per.node=52428800;
 -- 一个交换机下split的至少的大小(这个值决定了多个交换机上的文件是否需要合并)
-set mapred.min.split.size.per.rack=268435456;
+-- set mapred.min.split.size.per.rack=268435456;
 ```
 
 ## 5 reduce个数
+
+```sql
+-- 方式1：根据map输入大小确定reduce个数
+-- 设置reduce处理的大小为256M, 会根据这个来计算reduce个数
+set hive.exec.reducers.bytes.per.reducer=268435456;
+
+-- 方式2：直接指定reduce个数(不建议使用)
+-- 一般不用，如果集群资源不足，造成程序运行出现OOM(内存溢出不足)，可以根据推定的reduce个数手动增加数量
+set mapred.reduce.tasks=15;
+```
 
 reduce个数并不是越多越好，同map一样，启动和初始化reduce也会消耗时间和资源；
 另外，有多少个reduce,就会有多少个输出文件，如果生成了很多个小文件，那么如果这些小文件作为下一个任务的输入，则也会出现小文件过多的问题。
@@ -132,16 +147,6 @@ reduce个数并不是越多越好，同map一样，启动和初始化reduce也�
 1. 使用order by，为了保证顺序只能在一个reduce中排序
 2. 有笛卡尔积，使用join没带关联条件就会发生笛卡尔积,改善方法是加上on条件,注意hive的join on中只能用and而不能用or
 3. count(distinct xxx)
-
-```sql
--- 方式1：根据map输入大小确定reduce个数
--- 设置reduce处理的大小为256M, 会根据这个来计算reduce个数
-set hive.exec.reducers.bytes.per.reducer=268435456;
-
--- 方式2：直接指定reduce个数
--- 一般不用，如果集群资源不足，造成程序运行出现OOM(内存溢出不足)，可以根据推定的reduce个数手动增加数量
-set mapred.reduce.tasks=15;
-```
 
 ## 6 map输出压缩&reduce输出时合并小文件
 
@@ -175,6 +180,43 @@ set hive.auto.convert.join=true;
 set hive.mapjoin.smalltable.filesize=25000000;
 ```
 
+## 8 数据倾斜优化
+
+```sql
+-- group by操作是否支持倾斜数据负载均衡。思想:先打散再聚合
+set hive.groupby.skewindata=true；
+
+-- 判断数据倾斜的阈值，如果在join中发现同样的key超过该值则认为是该key是倾斜的join key，默认是100000；
+set hive.skewjoin.key=100000;
+```
+
+`set hive.groupby.skewindata=true；`
+
+思想：先打散再聚合
+注意：只能对单个字段聚合（当启用时如果要在查询语句中对多个字段进行去重统计时会报错）。
+
+- 控制生成两个MR Job
+- 在第一个MR中，map 的输出结果集合会随机分布到 reduce 中，每个reduce 做部分聚合操作，并输出结果。这样处理的结果是，相同的 Group By Key 有可能分发到不同的reduce中，从而达到负载均衡的目的；
+- 第二个MR任务再根据预处理的数据结果按照 Group By Key 分布到 reduce 中（这个过程可以保证相同的Group By Key分布到同一个reduce 中），最后完成最终的聚合操作。
+
+总结：
+
+- 它使计算变成了两个MR，先在第一个中在 shuffle 过程 partition 时随机给 key 打标记，使每个key 随机均匀分布到各个 reduce 上计算，但是这样只能完成部分计算，因为相同key没有分配到相同reduce上。
+- 所以需要第二次的MR,这次就回归正常 shuffle，但是数据分布不均匀的问题在第一次MR已经有了很大的改善，因此基本解决数据倾斜。因为大量计算已经在第一次MR中随机分布到各个节点完成。
+
+```shell
+# 注意: 当set hive.groupby.skewindata=ture;时如果要在查询语句中对多个字段进行去重统计时会报错。
+hive> set hive.groupby.skewindata=true;
+hive> select count(distinct id),count(distinct x) from test;
+FAILED: SemanticException [Error 10022]: DISTINCT on different columns not supported with skew in data
+
+
+# 使用下面的方式是正确的
+hive> select count(distinct id, x) from test; 
+```
+
+
+
 
 
 
@@ -184,43 +226,21 @@ set hive.mapjoin.smalltable.filesize=25000000;
 ## 99 其他参数
 
 ```sql
-set mapreduce.reduce.input.buffer.percent=1;
-
 -- 禁止并行执行
 set hive.exec.parallel=false;
 
--- 在map端中会做部分聚集操作，效率更高但需要更多的内存
+-- 开启map端combiner，在map端中会做部分聚集操作，效率更高但需要更多的内存
 set hive.map.aggr=true；
 
-
-
-
--- group by操作是否支持倾斜数据负载均衡。思想:先打散再聚合
--- ！！！注意：只能对单个字段聚合（当启用时如果要在查询语句中对多个字段进行去重统计时会报错）。
--- 控制生成两个MR Job,第一个MR Job Map的输出结果随机分配到reduce中减少某些key值条数过多某些key条数过小造成的数据倾斜问题。
--- 在第一个 MapReduce 中，map 的输出结果集合会随机分布到 reduce 中，每个reduce 做部分聚合操作，并输出结果。
--- 这样处理的结果是，相同的 Group By Key 有可能分发到不同的reduce中，从而达到负载均衡的目的；
--- 第二个 MapReduce 任务再根据预处理的数据结果按照 Group By Key 分布到 reduce 中（这个过程可以保证相同的Group By Key分布到同一个reduce 中），最后完成最终的聚合操作。
-set hive.groupby.skewindata=true；
-
--- 判断数据倾斜的阈值，如果在join中发现同样的key超过该值则认为是该key是倾斜的join key，默认是100000；
-set hive.skewjoin.key=100000;
-
--- hive操作执行时的模式，默认是nonstrict非严格模式，如果是strict模式，很多有风险的查询会被禁止运行，比如笛卡尔积的join和动态分区；
-hive.mapred.mode
-
-
-
+-- 保存map输出文件的堆内存比例，默认0.0
+set mapreduce.reduce.input.buffer.percent=1;
 
 -- UDTF执行时hive是否发送进度信息到TaskTracker，默认是false；
-hive.udtf.auto.progress
+set hive.udtf.auto.progress=false;
 
 
-
-
-
--- 设置一行最大的读取长度（默认是Integer.maxvalue）-当压缩包里有非法数据（一条数据过长的时候）
+-- 设置一行最大的读取长度, 当压缩包里有非法数据（一条数据过长的时候）
 -- 超长行会导致内存溢出, 设置该参数可以确保 recordreader 跳过超长行
-mapreduce.input.linerecordreader.line.maxlength
+set mapreduce.input.linerecordreader.line.maxlength=1000000;
 ```
 
