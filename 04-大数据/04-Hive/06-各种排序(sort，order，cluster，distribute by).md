@@ -37,7 +37,9 @@ cluster by A 等同于 distribute by A sort by A
 
 distribute by 和 sort by 合用就相当于cluster by，**但是cluster by 不能指定排序规则为asc或 desc** ，只能是**升序**排列。
 
-## distribute by和group by的区别
+## 5 比较
+
+### 5.1 distribute by和group by的区别
 
 都是按key值划分数据 都使用reduce操作唯一不同的是，
 
@@ -45,7 +47,7 @@ distribute by只是单纯的分散数据，distribute by col – 按照col列把
 
 而group by把相同key的数据聚集到一起，后续必须是聚合操作。
 
-## order by和sort by的区别
+### 5.2 order by和sort by的区别
 
 order by是全局排序 sort by只是确保每个reduce上面输出的数据有序。
 
