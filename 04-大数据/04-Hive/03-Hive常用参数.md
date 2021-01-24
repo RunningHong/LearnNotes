@@ -19,6 +19,8 @@ set hive.metastroe.warehouse.dir;
 -- 如果是strict模式，很多有风险的查询会被禁止运行，比如笛卡尔积的join和动态分区；
 set hive.mapred.mode=nonstrict;
 
+-- 让CLI打印出字段名称
+set hive.cli.print.header=true;
 ```
 
 ## 2 动态分区相关
@@ -27,9 +29,14 @@ set hive.mapred.mode=nonstrict;
 -- 动态分区相关
 set hive.exec.dynamic.partition.mode=nonstrict;
 set hive.exec.dynamic.partition=true;
+-- 所有执行MR的节点上，最大一共可以创建多少个动态分区。
 set hive.exec.max.dynamic.partitions=100000;
+-- 在每个执行MR的节点上，最大可以创建多少个动态分区
 set hive.exec.max.dynamic.partitions.pernode=100000;
 
+-- 整个MR Job中，最大可以创建多少个HDFS文件。
+-- 在linux系统当中，每个linux用户最多可以开启1024个进程，每一个进程最多可以打开2048个文件，即持有2048个文件句柄，下面这个值越大，就可以打开文件句柄越大
+set hive.exec.max.created.files=100000;
 
 -- 当动态分区启用时，如果数据列里包含null或者空字符串的话，数据会被插入到这个分区，默认名字是__HIVE_DEFAULT_PARTITION__
 set hive.exec.default.partition.name=__HIVE_DEFAULT_PARTITION__;
@@ -228,16 +235,33 @@ hive> select count(distinct id, x) from test;
 ```sql
 -- 禁止并行执行
 set hive.exec.parallel=false;
+-- 同一个sql允许最大并行度，默认为8。
+set hive.exec.parallel.thread.number=16; 
+
 
 -- 开启map端combiner，在map端中会做部分聚集操作，效率更高但需要更多的内存
 set hive.map.aggr=true；
+-- 在Map端进行聚合操作的条目数目
+set hive.groupby.mapaggr.checkinterval = 100000;
+
+
+-- Hive某些情况的查询可以不必使用MapReduce计算。
+-- 例如：SELECT * FROM test;
+set hive.fetch.task.conversion=more;
+
+
+-- 本地模式
+-- 有时Hive的输入数据量是非常小，直接在本地运行速度会更快
+set hive.exec.mode.local.auto=true;
+-- job的输入数据大小必须小于参数(默认128MB)
+set hive.exec.mode.local.auto.inputbytes.max;
+
 
 -- 保存map输出文件的堆内存比例，默认0.0
 set mapreduce.reduce.input.buffer.percent=1;
 
 -- UDTF执行时hive是否发送进度信息到TaskTracker，默认是false；
 set hive.udtf.auto.progress=false;
-
 
 -- 设置一行最大的读取长度, 当压缩包里有非法数据（一条数据过长的时候）
 -- 超长行会导致内存溢出, 设置该参数可以确保 recordreader 跳过超长行

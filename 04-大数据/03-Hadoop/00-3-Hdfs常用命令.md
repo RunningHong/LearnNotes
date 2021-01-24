@@ -43,7 +43,7 @@ hadoop fs -get /user/anna/input/* /opt/module/hadoop
 
 ## 5 删除-rm
 
-```
+```shell
 hdfs dfs -rm -r /user/anna/output
 
 # 删除时不放入缓存
@@ -52,13 +52,13 @@ hdfs dfs -rm -r -skipTrash /user/anna/output
 
 ## 6 移动文件-cp
 
-```
+```shell
 hadoop fs -cp /user/anna/input/wc.input /user/anna/test
 ```
 
 ## 7 目录/文件是否存在-test -e
 
-```
+```shell
     # 查看hdfs上文件分区目录是否创建，如果创建就删去
     hdfs dfs -test -e ${HDFS_LOCATION_PARTITION}
     if [[ $? -eq 0 ]]; then
@@ -70,13 +70,13 @@ hadoop fs -cp /user/anna/input/wc.input /user/anna/test
 
 ## 8 列出文件-ls
 
-```
+```shell
 hdfs dfs -ls /user/hadoop
 ```
 
 ## 9 统计文件大小-du
 
-```
+```shell
 hdfs dfs -du -h /user/hadoop
 
 # 总量查看（summary）
