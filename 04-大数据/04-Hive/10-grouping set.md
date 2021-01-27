@@ -10,13 +10,13 @@ GROUP BY GROUPING SETS 是对 GROUP BY 子句的扩展，它能够在一个 GROU
 
 GROUPING SETS 语句：
 
-```text
-SELECT k1, k2, SUM( k3 ) FROM t GROUP BY GROUPING SETS ( (k1, k2), (k1), (k2), ( ) );
+```sql
+SELECT k1, k2, SUM( k3 ) FROM t GROUP BY k1,k2 GROUPING SETS ( (k1, k2), (k1), (k2), ( ) );
 ```
 
 其查询结果等价于：
 
-```text
+```sql
 SELECT k1, k2, SUM( k3 ) FROM t GROUP BY k1, k2
 UNION
 SELECT k1, null, SUM( k3 ) FROM t GROUP BY k1
@@ -28,7 +28,7 @@ SELECT null, null, SUM( k3 ) FROM t
 
 例子：
 
-```text
+```sql
 mysql> SELECT * FROM t;
 +------+------+------+
 | k1   | k2   | k3   |
@@ -65,13 +65,13 @@ mysql> SELECT k1, k2, SUM(k3) FROM t GROUP BY GROUPING SETS ( (k1, k2), (k2), (k
 
 ROLLUP 是对 GROUPING SETS 的扩展。
 
-```text
+```sql
 SELECT a, b,c, SUM( d ) FROM tab1 GROUP BY ROLLUP(a,b,c)
 ```
 
 这个 ROLLUP 等价于下面的 GROUPING SETS：
 
-```text
+```sql
 GROUPING SETS (
 (a,b,c),
 ( a, b ),
@@ -84,7 +84,7 @@ GROUPING SETS (
 
 CUBE 也是对 GROUPING SETS 的扩展。
 
-```text
+```sql
 CUBE ( e1, e2, e3, ... )
 ```
 
@@ -92,7 +92,7 @@ CUBE ( e1, e2, e3, ... )
 
 例如，CUBE ( a, b, c ) 等价于下面的 GROUPING SETS：
 
-```text
+```sql
 GROUPING SETS (
 ( a, b, c ),
 ( a, b ),
