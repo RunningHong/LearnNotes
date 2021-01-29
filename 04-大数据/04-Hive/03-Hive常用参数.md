@@ -258,6 +258,7 @@ set hive.exec.mode.local.auto.inputbytes.max;
 
 
 -- 保存map输出文件的堆内存比例，默认0.0
+-- 该参数可能会引起bug，
 set mapreduce.reduce.input.buffer.percent=1;
 
 -- UDTF执行时hive是否发送进度信息到TaskTracker，默认是false；
