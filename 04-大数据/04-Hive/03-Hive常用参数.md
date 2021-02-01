@@ -45,17 +45,28 @@ set hive.exec.default.partition.name=__HIVE_DEFAULT_PARTITION__;
 ## 3 MR内存相关
 
 ```sql
--- 每个Map任务分配的内存使用量，单位mb
+-- 设置map堆最大大小为6554M
+set mapred.child.map.java.opts=-Xmx6554M;
+-- 设置reduce堆最大大小6554M
+set mapred.child.reduce.java.opts=-Xmx6554M;
+
+
+
+-- container的内存-每个Map任务分配的内存使用量，单位mb
 set mapreduce.map.memory.mb=8192;
--- 对map中对jvm child设置最大的堆大小
+-- 对map中对jvm设置最大的堆大小
 set mapreduce.map.java.opts='-Xmx8192M';
 
-
--- 每个reduce任务分配的内存使用量，单位mb
+-- container的内存-每个reduce任务分配的内存使用量，单位mb
 set mapreduce.reduce.memory.mb=8192;
--- 对reduce中对jvm child设置最大的堆大小
+-- 对reduce中对jvm设置最大的堆大小
 set mapreduce.reduce.java.opts='-Xmx8192M';
 ```
+
+`mapred.map.child.java.opts`和`mapreduce.map.memeory.mb`的区别：
+
+- `mapreduce.map.memory.mb`是向ResourceManager申请的内存资源大小，这些资源可用用于各种程序语言编写的程序
+- `mapred.map.child.java.opts` 一般只用于配置JVM参数
 
 ## 4 map个数-切片&小文件合并
 

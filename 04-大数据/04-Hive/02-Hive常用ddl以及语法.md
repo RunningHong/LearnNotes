@@ -375,7 +375,7 @@ select distinct a.* from tripdata a order by rand(12345)
 
 ## 17 shell以及hiveCLI中的\总结
 
-```
+```shell
     1、在hiveCLI中
         hiveCLI会对\进行一步解析，如: \\会被解析为\， 同理\\\\会被解析为\\
             在hiveCLI如果我们需要对字符串中\进行替换,就需要写成： select regexp_replace('aa\bb', '\\\\', ''); -> ab
