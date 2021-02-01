@@ -233,14 +233,6 @@ FAILED: SemanticException [Error 10022]: DISTINCT on different columns not suppo
 hive> select count(distinct id, x) from test; 
 ```
 
-
-
-
-
-
-
-
-
 ## 99 其他参数
 
 ```sql
