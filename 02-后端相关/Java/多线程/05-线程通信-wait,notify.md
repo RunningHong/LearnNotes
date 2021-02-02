@@ -80,6 +80,8 @@ class PrintNumber implements Runnable {
 
 给每个线程不同的condition. 可以用condition.signal()精确地通知对应的线程继续执行(在对应的condition上await的线程, 可能是多个)。
 
+例子：三个线程按顺序打印数字1/2/3
+
 ```java
 public class TestSequential01 {
     private static Lock lock = new ReentrantLock();
@@ -114,3 +116,6 @@ public class TestSequential01 {
 }
 ```
 
+## ps-相关资料
+
+[三个线程按顺序交替打印ABC](https://www.jianshu.com/p/f79fa5aafb44)
