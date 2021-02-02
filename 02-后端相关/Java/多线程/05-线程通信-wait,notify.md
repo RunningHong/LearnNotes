@@ -8,7 +8,7 @@
 
 ## 1 代码实现
 
-```
+```java
 package com.hong.concurrent;
 
 /**
@@ -75,4 +75,42 @@ class PrintNumber implements Runnable {
 1. wait(), notify(), notifyAll()这三个方法必须在同步代码块或者同步方法中
 2. wait(), notify(), notifyAll()这三个方法的调用者必须是同步代码块或者同步方法中的同步监视器，否者会报IllegalMonitorStateException异常。
 3. wait(), notify(), notifyAll()这三个方法是定义在java.lang.Object中的
+
+## 4 使用Condition精确控制
+
+给每个线程不同的condition. 可以用condition.signal()精确地通知对应的线程继续执行(在对应的condition上await的线程, 可能是多个)。
+
+```java
+public class TestSequential01 {
+    private static Lock lock = new ReentrantLock();
+    private static Condition[] conditions = {lock.newCondition(), lock.newCondition(), lock.newCondition()};
+    private volatile int state = 1;
+ 
+    private void run(final int self) {
+        int next = self % 3 + 1;
+        while(true) {
+            lock.lock();
+            try {
+                while(this.state != self) {
+                    conditions[self - 1].await();
+                }
+                System.out.println(self);
+                this.state = next;
+                conditions[next - 1].signal();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            lock.unlock();
+        }
+    }
+ 
+    public static void main(String[] args) {
+        TestSequential01 rlc = new TestSequential01();
+        for (int i = 1; i < 4; i++) {
+            int j = i;
+            new Thread(()->rlc.run(j)).start();
+        }
+    }
+}
+```
 
