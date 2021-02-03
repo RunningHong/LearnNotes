@@ -50,14 +50,14 @@
 
 比如说：
 
-```
+```sql
 select a.id, a.name from a where a.id in (select b.id from b);
 select a.id, a.name from a where exists (select id from b where a.id = b.id);
 ```
 
 应该转换成：
 
-```
+```sql
 select a.id, a.name from a left semi join b on a.id = b.id;
 ```
 
@@ -99,7 +99,7 @@ Map 数太小
 
 文件数目过多，会给 HDFS 带来压力，并且会影响处理效率，可以通过合并 Map 和 Reduce 的 结果文件来消除这样的影响：
 
-```
+```sql
 set hive.merge.mapfiles = true ##在 map only 的任务结束时合并小文件
 
 set hive.merge.mapredfiles = false ## true 时在 MapReduce 的任务结束时合并小文件
@@ -139,7 +139,7 @@ adoop MapReduce 程序中，reducer 个数的设定极大影响执行效率，�
 
 **在使用写有 Join 操作的查询语句时有一条原则：应该将条目少的表/子查询放在 Join 操作 符的左边。**原因是在 Join 操作的 Reduce 阶段，位于 Join 操作符左边的表的内容会被加 载进内存，将条目少的表放在左边，可以有效减少发生 OOM 错误的几率。对于一条语句 中有多个 Join 的情况，如果 Join 的条件相同，比如查询
 
-```
+```sql
 INSERT OVERWRITE TABLE pv_users
 SELECT pv.pageid, u.age FROM page_view p
 JOIN user u ON (pv.userid = u.userid)
@@ -150,7 +150,7 @@ JOIN newuser x ON (u.userid = x.userid);
 
 如果 join 的条件不相同，比如：
 
-```
+```mysql
 INSERT OVERWRITE TABLE pv_users
  SELECT pv.pageid, u.age FROM page_view p
  JOIN user u ON (pv.userid = u.userid)
@@ -159,7 +159,7 @@ INSERT OVERWRITE TABLE pv_users
 
 Map-Reduce 的任务数目和 Join 操作的数目是对应的，上述查询和以下查询是等价的
 
-```
+```sql
 --先 page_view 表和 user 表做链接
 INSERT OVERWRITE TABLE tmptable
  SELECT * FROM page_view p JOIN user u ON (pv.userid = u.userid);
