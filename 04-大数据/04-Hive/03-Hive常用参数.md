@@ -21,6 +21,9 @@ set hive.mapred.mode=nonstrict;
 
 -- 让CLI打印出字段名称
 set hive.cli.print.header=true;
+
+-- 可以group/order by数字，如group by 1,2,3
+set hive.groupby.orderby.position.alias=true;
 ```
 
 ## 2 动态分区相关
