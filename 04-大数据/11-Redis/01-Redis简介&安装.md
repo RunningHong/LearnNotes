@@ -1,6 +1,6 @@
 [toc]
 
-# Redis基础
+# Redis简介&安装
 
 ## 1 NoSQL
 
