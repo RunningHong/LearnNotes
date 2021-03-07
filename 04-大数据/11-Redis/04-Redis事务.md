@@ -20,7 +20,15 @@ Redis 事务可以一次执行多个命令， 并且带有以下三个重要的�
 
 Redis事务没有隔离级别的概念，所有的命令并不是直接执行，而是先放到队列中，只有最后执行事务的时候才会执行
 
-## 2 常用命令
+## 2 事务特性
+
+- **单独的隔离操作**：事务中的所有命令都会序列化、按顺序地执行。事务在执行的过程中，不会被其他客户端发送来的命令请求所打断。
+- **没有隔离级别的概念**：队列中的命令没有提交之前都不会实际的被执行，因为事务提交前任何指令都不会被实际执行， 也就不存在”事务内的查询要看到事务里的更新，在事务外查询不能看到”这个让人万分头痛的问题
+- **不保证原子性**：redis同一个事务中如果有一条命令执行失败，其后的命令仍然会被执行，没有回滚
+
+不遵循传统的ACID中的AI
+
+## 3 常用CLI命令
 
 | 命令                | 描述                                                         |
 | ------------------- | ------------------------------------------------------------ |
@@ -77,7 +85,7 @@ localhost:6379> get k3 # 虽然事务中有报错但是其他指令也执行成�
 "v3"
 ```
 
-## 3 事务watch监控
+## 4 事务watch监控
 
 - 悲观锁
     - 悲观锁(Pessimistic Lock), 顾名思义，就是很悲观，每次去拿数据的时候都认为别人会修改，所以每次在拿数据的时候都会上锁，这样别人想拿这个数据就会block直到它拿到锁。传统的关系型数据库里边就用到了很多这种锁机制，比如行锁，表锁等，读锁，写锁等，都是在做操作之前先上锁。
@@ -91,7 +99,36 @@ localhost:6379> get k3 # 虽然事务中有报错但是其他指令也执行成�
 - Watch指令，类似乐观锁，事务提交时，如果Key的值已被别的客户端改变， 比如某个list已被别的客户端push/pop过了，整个事务队列都不会被执行
 - 通过WATCH命令在事务执行之前监控了多个Keys，倘若在WATCH之后有任何Key的值发生了变化， EXEC命令执行的事务都将被放弃，同时返回Nullmulti-bulk应答以通知调用者事务执行失败
 
-```
+```shell
+#### 正常情况，监视money途中没有其他一组命令对money进行修改
+localhost:6379> watch money # 监视money
+OK
+localhost:6379> multi
+OK
+localhost:6379(TX)> decrby money 20
+QUEUED
+localhost:6379(TX)> decrby money 30
+QUEUED
+localhost:6379(TX)> exec
+1) (integer) -20
+2) (integer) -50
 
+
+### 异常情况，监视money途中有其他一组命令对money进行修改
+localhost:6379> flushdb
+OK
+localhost:6379> watch money # 监视money
+OK
+localhost:6379> multi
+OK
+localhost:6379(TX)> incrby money 10
+QUEUED
+localhost:6379(TX)> incrby money 30
+QUEUED
+# xxxxx # 此时有一组操作对money进行赋值 set money 1000
+localhost:6379(TX)> exec # 监视期间其他一组操作有对money进行修改，事务失败
+(nil)
+localhost:6379> unwatch # 取消监控，解锁
+OK
 ```
 
