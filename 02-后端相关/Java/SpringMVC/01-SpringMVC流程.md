@@ -2,7 +2,7 @@
 
 ## 1 整体流程
 
-![1558582253094](.\picture\1558582253094.png)
+![1558582253094](..\Spring\picture\1558582253094.png)
 
 1. 用户发送请求至前端控制器DispatcherServlet
 2. DispatcherServlet收到请求调用处理器映射器HandlerMapping。
