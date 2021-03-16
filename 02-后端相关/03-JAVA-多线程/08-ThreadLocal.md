@@ -14,6 +14,57 @@ ThreadLocal是解决线程安全问题一个很好的思路，它通过为每个
 
 最常见的ThreadLocal使用场景为用来解决数据库连接、Session管理等。
 
+
+
+## ThreadLocal重要方法
+
+```java
+public class ThreadLocal<T> {
+	public void set(T value) {
+		//这一步是取得当前线程
+	    Thread t = Thread.currentThread();
+	    //获取到一个ThreadLocalMap对象
+	    ThreadLocalMap map = getMap(t);
+	    //获取到map如果是null就创建并赋值
+	    if (map != null)
+	    	//map中的键为线程对象，值为变量副本
+	        map.set(this, value);
+	    else
+	        createMap(t, value);
+	}
+	void createMap(Thread t, T firstValue) {
+        t.threadLocals = new ThreadLocalMap(this, firstValue);
+    }
+	ThreadLocalMap getMap(Thread t) {
+		//这个返回的是Thread的成员变量threadLocals
+	    return t.threadLocals;
+	}
+	//这个ThreadLocalMap 是个内部类
+	static class ThreadLocalMap {
+		//Entry继承自WeakReference将ThreadLocal作为弱引用，GC运行, ThreadLocal即被回收
+		static class Entry extends WeakReference<ThreadLocal<?>> {
+            /** The value associated with this ThreadLocal. */
+            Object value;
+
+            Entry(ThreadLocal<?> k, Object v) {
+                super(k);
+                value = v;
+            }
+        }
+	}
+}
+public class Thread implements Runnable {
+	//看吧Thread类中的threadLocals实际上就是ThreadLocalMap，并且ThreadLocalMap是ThreadLocal的内部类
+	ThreadLocal.ThreadLocalMap threadLocals = null;
+}
+```
+
+
+
+
+
+
+
 ## 总结
 
 在每个线程Thread内部有一个ThreadLocal.ThreadLocalMap类型的成员变量threadLocals，这个threadLocals就是用来存储实际的变量副本的，键值为当前ThreadLocal变量，value为变量副本（即T类型的变量）。 初始时，在Thread里面，threadLocals为空，当通过ThreadLocal变量调用get()方法或者set()方法，就会对Thread类中的threadLocals进行初始化，并且以当前ThreadLocal变量为键值，以ThreadLocal要保存的副本变量为value，存到threadLocals。 然后在当前线程里面，如果要使用副本变量，就可以通过get方法在threadLocals里面查找。
@@ -24,19 +75,12 @@ ThreadLocal是解决线程安全问题一个很好的思路，它通过为每个
 
 
 
-
-
-
-
-
-
-
-
-
-
 ## ps-相关资料
 
 [ThreadLocal作用、场景、原理](https://www.jianshu.com/p/6fc3bba12f38)
 
 [Java并发编程：深入剖析ThreadLocal](https://www.cnblogs.com/dolphin0520/p/3920407.html)
 
+[ThreadLocal理解及应用](https://blog.csdn.net/zzg1229059735/article/details/82715741)
+
+[ThreadLocal应用-多数据源切换](https://blog.csdn.net/csdn_mingss/article/details/86586322)
