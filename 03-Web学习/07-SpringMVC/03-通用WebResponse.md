@@ -1,3 +1,5 @@
+[toc]
+
 # 通用Controller与前台交互的参数类型
 
 ## 1 WebResponse类
@@ -63,7 +65,7 @@ public class WebResponse<T> {
 }
 ```
 
-## 2 使用方法
+## 2 使用示例
 
 ```java
 @RestController
