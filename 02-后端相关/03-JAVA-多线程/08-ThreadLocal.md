@@ -22,7 +22,8 @@ ThreadLocal并不是一个Thread，而是Thread的局部变量，也许把它命
 
 ```java
 public class ThreadLocal<T> {
-    // 设置值
+    
+    // 获取当前线程的ThreadLocalMap，然后往map里添加KV，K是当前ThreadLocal实例，V是我们传入的value
 	public void set(T value) {
 		//这一步是取得当前线程
 	    Thread t = Thread.currentThread();
@@ -35,6 +36,32 @@ public class ThreadLocal<T> {
 	    else
 	        createMap(t, value);
 	}
+    
+    // 获取当前线程的私有变量，即ThreadLocalMap实例；
+    // 如果不为空，以当前ThreadLocal实例为key获取value；
+    // 如果ThreadLocalMap为空或者根据当前ThreadLocal实例获取的value为空，则执行setInitialValue()；
+    public T get() {
+        Thread t = Thread.currentThread();
+        ThreadLocalMap map = getMap(t);
+        if (map != null) {
+            ThreadLocalMap.Entry e = map.getEntry(this);
+            if (e != null)
+                return (T)e.value;
+        }
+        // 设置初始化值
+        return setInitialValue();
+    }
+    
+    private T setInitialValue() {
+        T value = initialValue();
+        Thread t = Thread.currentThread();
+        ThreadLocalMap map = getMap(t);
+        if (map != null)
+            map.set(this, value);
+        else
+            createMap(t, value);
+        return value;
+    }
     
 	void createMap(Thread t, T firstValue) {
         t.threadLocals = new ThreadLocalMap(this, firstValue);
@@ -81,19 +108,37 @@ public class Thread implements Runnable {
 
 图中左边是栈，右边是堆。线程的一些局部变量和引用使用的内存属于Stack（栈）区，而普通的对象是存储在Heap（堆）区。
 
+1. 线程运行时，我们定义的TheadLocal对象被初始化，存储在Heap(ThreadLocal对象)，同时线程运行的栈区保存了指向该实例的引用(即图中的ThreadLocal ref)。
+2. 当ThreadLocal的set/get被调用时，虚拟机会根据当前线程的引用也就是CurrentThreadRef找到其对应在堆区的实例，然后查看其对用的TheadLocalMap实例是否被创建，如果没有，则创建并初始化。
+3. Map实例化之后，也就拿到了该ThreadLocalMap的句柄(即图中的threadLocals成员变量ref)，那么就可以将当前ThreadLocal对象作为key，进行存取操作。
+4. ThreadLocalMap中的Entity是一个map结构的数据，key指向的是ThreadLocal对象实例（弱引用），value指向的是ThreadLocal真实存储的值。
 
+### 3.3 为什么ThreadLocalMap的key会使用弱引用呢？
 
+ThreadLocalMap的key是一个弱引用类型，源代码如下：
 
+```java
+static class ThreadLocalMap {
+    // 定义一个Entry类，key是一个弱引用的ThreadLocal对象
+    // value是任意对象
+    static class Entry extends WeakReference<ThreadLocal<?>> {
+        /** The value associated with this ThreadLocal. */
+        Object value;
+        Entry(ThreadLocal<?> k, Object v) {
+            super(k);
+            value = v;
+        }
+    }
+    // 省略其他
+}
+```
 
-## 总结
+**弱引用：回收就会死亡**：被弱引用关联的对象实例只能生存到下一次垃圾收集发生之前。当垃圾收集器工作时，无论当前内存是否足够，都会回收掉只被弱引用关联的对象实例。在JDK 1.2之后，提供了WeakReference类来实现弱引用。
 
-在每个线程Thread内部有一个ThreadLocal.ThreadLocalMap类型的成员变量threadLocals，这个threadLocals就是用来存储实际的变量副本的，键值为当前ThreadLocal变量，value为变量副本（即T类型的变量）。 初始时，在Thread里面，threadLocals为空，当通过ThreadLocal变量调用get()方法或者set()方法，就会对Thread类中的threadLocals进行初始化，并且以当前ThreadLocal变量为键值，以ThreadLocal要保存的副本变量为value，存到threadLocals。 然后在当前线程里面，如果要使用副本变量，就可以通过get方法在threadLocals里面查找。
+为什么ThreadLocalMap的key会使用弱引用呢，这是因为：
+当引用ThreadLocal的对象被回收时（如上面图中的ThreadLocal对象实例），由于ThreadLocalMap的key持有ThreadLocal的弱引用，即使没有手动断开引用，ThreadLocal也会被回收。
 
-1. 实际的通过ThreadLocal创建的副本是存储在每个线程自己的threadLocals中的；
-2. 为何threadLocals的类型ThreadLocalMap的键值为ThreadLocal对象，因为每个线程中可有多个threadLocal变量，就像上面代码中的longLocal和stringLocal；
-3. 在进行get之前，必须先set，否则会报空指针异常；如果想在get之前不需要调用set就能正常访问的话，必须重写initialValue()方法。 因为在上面的代码分析过程中，我们发现如果没有先set的话，即在map中查找不到对应的存储，则会通过调用setInitialValue方法返回i，而在setInitialValue方法中，有一个语句是T value = initialValue()， 而默认情况下，initialValue方法返回的是null。
-
-
+这里有一个注意点：value不是弱引用，所以当前value只有在下一次ThreadLocalMap调用set、get、remove的时候会被清除。如果我们不使用这个值了最好手动的remove（不remove那么value对象的生命周期就和项目的生存周期一样长），就可能会造成内存泄漏问题。
 
 ## ps-相关资料
 
