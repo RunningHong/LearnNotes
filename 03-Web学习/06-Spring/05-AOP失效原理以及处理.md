@@ -12,7 +12,8 @@ public interface UserService {
     void hello();
 }
 
-public class UserServiceImpl {
+@Service
+public class UserServiceImpl implements UserService {
     
     // 如果controller直接调用saveUser()，事务正常触发
     @Transactional
@@ -40,7 +41,10 @@ public class UserServiceImpl {
 
 ## 2 失效原因
 
-AOP的底层实现原理其实使用的是动态代理
+AOP的实现有二类，
+
+- 如果是基于接口的，会采用动态代理，生成一个代理类
+- 如果是基于类的，会采用CGLib生成子类，然后在子类中扩展父类中的方法
 
 Spring AOP的java动态代理简单示例：
 
@@ -49,6 +53,7 @@ public interface PersonService {
     void hello();
 }
  
+@Service
 public class PersonServiceImpl implements PersonService {
     @Override
     public void hello() {
@@ -106,7 +111,7 @@ public class ProxyHandler implements InvocationHandler {
     1. 这时真实调用的其实并不是UserServiceProxy.saveUserProxy()，
     2. 而是调用的this.saveUser()（这里的this指向的是UserServiceImpl），**即调用UserServiceImpl.saveUser()**，**这里就没有走代理，所以注解失效**
 
-## 3 图解
+## 3 图解失效原因
 
 Controller调用hello()方法图解
 
@@ -116,19 +121,102 @@ Controller调用saveUser()方法图解
 
 ![image-20210323134602605](picture/image-20210323134602605.png)
 
-## 4 解决方案
+## 4 如何解决
 
-### 4.1 Spring解决方案
+其实解决的方法就是内部调用方法的时候直接调用代理方法，关系图如下：
 
+![image-20210323195135997](picture/image-20210323195135997.png)
 
+## 5 解决方法
 
-### 4.2 SpringBoot解决方案
+### 5.1 用Autowired 注入自身的实例
 
+```java
+@Service
+public class UserServiceImpl implements UserService {
+    
+    @Autowired // 注入自己
+    UserService userService;
+    
+    @Transactional
+    public void saveUser(){
+        User user = new User();
+        user.setName("zhangsan");
+        System.out.println("将用户存入数据库");
+    }
+    
+    @Transactional
+    public void hello(){
+        System.out.println("开始hello方法");
+        try {
+            // 通过注入的userService调用SaveUser();
+            userService.saveUser();
+        } catch (Exception  e) {
+            logger.error("发送消息异常");
+        }
+    }
+}
+```
 
+这个方法，第一眼看上去感觉有些怪，自己注入自己，感觉有点象递归/死循环的搞法，但确实可以work，Spring在解决循环依赖上有自己的处理方式，避免了死循环。 
 
+### 5.2 从Spring上下文获取增强后的代理对象
 
+```java
+@Service
+public class UserServiceImpl implements UserService {
+    @Autowired // 注入上下文
+    private ApplicationContext applicationContext;
+    
+    @Transactional
+    public void saveUser(){
+        User user = new User();
+        user.setName("zhangsan");
+        System.out.println("将用户存入数据库");
+    }
+    
+    @Transactional
+    public void hello(){
+        System.out.println("开始hello方法");
+        try {
+            // 通过上下文调用方法
+            applicationContext.getBean(UserService.class).saveUser();
+        } catch (Exception  e) {
+            logger.error("发送消息异常");
+        }
+    }
+}
+```
+
+### 5.3 利用AopContext
+
+```java
+    @Transactional
+    public void hello(){
+        System.out.println("开始hello方法");
+        try {
+            // 获取代理类
+            UserService userServiceProxy = (UserService)AopContext.currentProxy();
+            // 调用代理类方法
+            userServiceProxy.saveUser();
+        } catch (Exception  e) {
+            logger.error("发送消息异常");
+        }
+    }
+```
+
+不过这个方法要注意的是，必须在主类入口上加上exporseProxy=true，参考下图：
+
+![image-20210324101010010](picture/image-20210324101010010.png)
+
+如果是Spring则需要修改XML 新增如下语句；先开启cglib代理,开启 exposeProxy = true,暴露代理对象
+
+```java
+<aop:aspectj-autoproxy proxy-target-class="true" expose-proxy="true"/>
+```
 
 ## ps-相关引用
 
 - [bilibili-Spring AOP注解失效爬坑记](https://www.bilibili.com/video/BV1ft411f7Rc?from=search&seid=12553432421832948995)
 - [Spring之AOP注解失效原因和解决方法- 事务失效&自定义AOP失效](https://blog.csdn.net/fumushan/article/details/80090947)
+- [spring中aop不生效的几种解决办法](https://www.cnblogs.com/yjmyzz/p/why-spring-aop-does-not-work.html)
