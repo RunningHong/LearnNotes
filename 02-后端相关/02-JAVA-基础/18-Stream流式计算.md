@@ -113,7 +113,22 @@ class User {
 #### 1 filter -  过滤 
 
 ```java
+    /**
+     * filter是断定型接口，接受一个输入，返回true/false，类似于sql中的where
+     */
     @Test
+    public void testStreamFilter() {
+        List<String> list = Arrays.asList("a", "bb", "bb", "cc", "ddd");
+        System.out.println("原列表：" + list.toString()); // 原列表：[a, bb, bb, cc, ddd]
+
+        // 返回新列表
+        list=list.stream()
+                .filter(str -> !str.equals("bb")) // 保留不为bb的数据
+                .collect(Collectors.toList());
+        System.out.println("新列表：" + list); // 新列表：[a, cc, ddd]
+    }
+
+	@Test
     public void test4() {
         // 过滤list得到user的school是清欢大学的人
         List<User> userList1 = list.stream().filter(user -> "清华大学".equals(user.getSchool())).collect(Collectors.toList());
@@ -125,6 +140,22 @@ class User {
 #### 2 distinct -  去重
 
 ```java
+    /**
+     * distinct去重
+     */
+    @Test
+    public void testStreamDistinct() {
+        List<String> list = Arrays.asList("a", "bb", "bb", "cc", "ddd");
+        System.out.println("原列表：" + list.toString()); // 原列表：[a, bb, bb, cc, ddd]
+
+        // 返回新列表
+        list=list.stream()
+                .distinct() // 按遍历值去重
+                .collect(Collectors.toList());
+        System.out.println("新列表：" + list); // 新列表：[a, bb, cc, ddd]
+    }
+
+
     @Test
     public void test5() {
         System.out.println("按年龄去重得到去重年龄list");
@@ -136,6 +167,23 @@ class User {
 #### 3 limit - 限制条数
 
 ```java
+    /**
+     * limit限制条数
+     */
+    @Test
+    public void testStreamLimit() {
+        List<String> list = Arrays.asList("a", "bb", "bb", "cc", "ddd");
+        System.out.println("原列表：" + list.toString()); // 原列表：[a, bb, bb, cc, ddd]
+
+        // 返回新列表
+        list=list.stream()
+                .limit(2) // 只返回前两条数据
+                .collect(Collectors.toList());
+        System.out.println("新列表：" + list); // 新列表：[a, bb]
+    }
+
+
+
     @Test
     public void test6() {
         System.out.println("年龄是偶数的前两位user");
@@ -147,17 +195,60 @@ class User {
 #### 4 sorted - 排序
 
 ```java
+    /**
+     * sorted-排序
+     * 被排序的数据需要可比较即Comparable
+     * 可以自定义比较器
+     */
     @Test
+    public void testStreamSorted() {
+        List<String> list = Arrays.asList("a", "bb", "bb", "cc", "ddd");
+        System.out.println("原列表：" + list.toString()); // 原列表：[a, bb, bb, cc, ddd]
+
+        // 返回新列表
+        list=list.stream()
+                .sorted() // 按照默认比较器比较
+                .collect(Collectors.toList());
+        System.out.println("新列表：" + list); // 新列表：[a, bb, bb, cc, ddd]
+
+        list=list.stream()
+                .sorted( // 自定义比较器
+                    (s1, s2)->s2.length()-s1.length()
+                )
+                .collect(Collectors.toList());
+        System.out.println("新列表：" + list); // 新列表：[ddd, bb, bb, cc, a]
+    }
+
+
+	@Test
     public void test7() {
         System.out.println("按年龄从大到小排序");
         List<User> userList4 = list.stream().sorted((s1,s2) -> s2.age - s1.age).collect(Collectors.toList());
         userList4.forEach(user -> System.out.print(user.name + '、'));
     }
+
+
+
 ```
 
 #### 5 skip -  跳过n个元素后再输出 
 
 ```java
+    /**
+     * skip -  跳过n个元素后再输出
+     */
+    @Test
+    public void testStreamSkip() {
+        List<String> list = Arrays.asList("a", "bb", "bb", "cc", "ddd");
+        System.out.println("原列表：" + list.toString()); // 原列表：[a, bb, bb, cc, ddd]
+
+        // 返回新列表
+        list=list.stream()
+                .skip(2) // 跳过前两个元素
+                .collect(Collectors.toList());
+        System.out.println("新列表：" + list); // 新列表：[bb, cc, ddd]
+    }
+
     @Test
     public void test8() {
         System.out.println("跳过前面两个user的其他所有user");
@@ -169,12 +260,47 @@ class User {
 #### 6 map - 对每个元素做特定的操作
 
 ```java
+    /**
+     * map - 对每个元素做特定的操作
+     * map是函数型接口，允许一个输入一个输出
+     */
+    @Test
+    public void testStreamMap() {
+        List<String> list = Arrays.asList("a", "bb", "bb", "cc", "ddd");
+        System.out.println("原列表：" + list.toString()); // 原列表：[a, bb, bb, cc, ddd]
+
+        // 返回新列表
+        list=list.stream()
+                .map(str-> str.toUpperCase()) // 对遍历的结果做特定操作-转换为大写
+                .collect(Collectors.toList());
+        System.out.println("新列表：" + list); // 新列表：[A, BB, BB, CC, DDD]
+    }
+
     @Test
     public void test9() {
         System.out.println("学校是清华大学的user的名字");
         List<String> userList6 = list.stream().filter(user -> "清华大学".equals(user.school)).map(User::getName).collect(Collectors.toList());
         userList6.forEach(user -> System.out.print(user + '、'));
     }
+
+
+        SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        resultList.stream().map((obj)->{
+            try {
+                Date beginDate = simpleFormat.parse(obj.getBeginTime());
+                Date endDate = simpleFormat.parse(obj.getEndTime());
+
+                long beginDateTime = beginDate.getTime();
+                long endDateTime = endDate.getTime();
+
+                Long diffSecond = (endDateTime-beginDateTime)/1000;
+                obj.setExeDuration(diffSecond.toString()+"s");
+            } catch (ParseException e) {
+                LOGGER.error("时间格式转换出错");
+                e.printStackTrace();
+            }
+            return obj;
+        }).collect(Collectors.toList());
 ```
 
 - mapToInt(ToIntFunction<? super T> mapper)
@@ -194,16 +320,23 @@ public void test10() {
 #### 7 flatMap -  将遍历的值转成一个新的流 
 
 ```java
+    /**
+     * flatMap -  将遍历的值转成一个新的流
+     */
     @Test
-    public void test11() {
-        String[] strings = {"Hello", "World"};
-        String s = "hello";
-        String[] split = s.split("");
-        List l1 = Arrays.stream(strings).map(str -> str.split("")).map(Arrays::stream).distinct().collect(Collectors.toList());
-//        List l1 = Arrays.stream(split).distinct().collect(Collectors.toList());
-        List l2 = Arrays.asList(strings).stream().map(str -> str.split("")).flatMap(Arrays::stream).distinct().collect(Collectors.toList());
-        System.out.println(l1.toString());
-        System.out.println(l2.toString());
+    public void testStreamFlatMap() {
+        String[] strArray = {"Hello", "World"};
+
+        List list1 = Arrays.asList(strArray).stream()
+                .map(str -> str.split("")) // 将字符串转换为字符串数组
+                .collect(Collectors.toList());
+        System.out.println(list1.toString()); // [[Ljava.lang.String;@5c8da962, [Ljava.lang.String;@512ddf17]
+
+        List list2 = Arrays.asList(strArray).stream()
+                .map(str -> str.split("")) // 将字符串转换为字符串数组
+                .flatMap(Arrays::stream) // 将前面的结果转换为新的流
+                .collect(Collectors.toList());
+        System.out.println(list2.toString()); // [H, e, l, l, o, W, o, r, l, d]
     }
 ```
 
