@@ -337,6 +337,13 @@ public void test10() {
                 .flatMap(Arrays::stream) // 将前面的结果转换为新的流
                 .collect(Collectors.toList());
         System.out.println(list2.toString()); // [H, e, l, l, o, W, o, r, l, d]
+
+
+        String[][] strArray2 = {{"aa","bb"},{"cc","dd"}};
+        List list3 = Arrays.stream(strArray2)
+                .flatMap(Arrays::stream)
+                .collect(Collectors.toList());
+        System.out.println(list3); // [aa, bb, cc, dd]
     }
 ```
 
